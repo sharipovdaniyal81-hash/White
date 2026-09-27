@@ -4,6 +4,7 @@ local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
+local StarterGui = game:GetService("StarterGui")
 
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "R6Hub"
@@ -39,11 +40,11 @@ end
 local SESSION_START = tick()
 local GLITCH_START_AT = 15
 local JUMPSCARE_AT   = 60
-local postJumpscare   = false   -- становится true после скримера
+local postJumpscare   = false
 local jumpscareFired  = false
 
 -- ============================================================
--- ПОРЧА ТЕКСТА
+-- ПОРЧА ТЕКСТА UI
 -- ============================================================
 local corruptionLevel = 0
 local HEAVY_TOP = {
@@ -179,6 +180,144 @@ local function characterLag(duration)
 end
 
 -- ============================================================
+-- ⭐ ГЛИТЧ САМОЙ ИГРЫ (ники, свойства, части)
+-- ============================================================
+local ZALGO_SHORT = { "̸̷̶̵̴", "̶̸̷̵̳", "̴̸̷̵̶", "̵̶̷̸̳", "̸̿̋̚" }
+local function corruptShort(text)
+	local out = ""
+	for i = 1, #text do
+		local c = text:sub(i, i)
+		out = out .. c
+		if c ~= " " then
+			out = out .. ZALGO_SHORT[math.random(1, #ZALGO_SHORT)]
+		end
+	end
+	return out
+end
+
+local savedNames = {}     -- [Player] = originalDisplayName
+local savedParts  = {}    -- [BasePart] = {Transparency, Color, Material, Anchored}
+
+local function glitchGameWorld(duration)
+	duration = duration or 2
+	local t0 = tick()
+
+	-- Собираем всех игроков и их гуманоидов
+	local humans = {}
+	for _, p in ipairs(game.Players:GetPlayers()) do
+		local c = p.Character
+		if c then
+			local h = c:FindFirstChildOfClass("Humanoid")
+			if h then
+				if not savedNames[p] then
+					savedNames[p] = h.DisplayName
+				end
+				table.insert(humans, {player = p, hum = h})
+			end
+		end
+	end
+
+	-- Собираем случайные части (ограничим 150 чтобы не лагало)
+	local parts = {}
+	local allDesc = workspace:GetDescendants()
+	local maxParts = 150
+	for _, obj in ipairs(allDesc) do
+		if obj:IsA("BasePart") and #parts < maxParts then
+			table.insert(parts, obj)
+			if not savedParts[obj] then
+				savedParts[obj] = {
+					Transparency = obj.Transparency,
+					Color = obj.Color,
+					Material = obj.Material,
+					Anchored = obj.Anchored,
+				}
+			end
+		end
+	end
+
+	task.spawn(function()
+		while tick() - t0 < duration do
+			-- 1. Портим ник неймплейты
+			for _, entry in ipairs(humans) do
+				pcall(function()
+					local orig = savedNames[entry.player] or entry.player.Name
+					entry.hum.DisplayName = corruptShort(orig)
+				end)
+			end
+
+			-- 2. Рандомно меняем свойства частей
+			for _ = 1, 8 do
+				if #parts > 0 then
+					local p = parts[math.random(1, #parts)]
+					pcall(function()
+						if math.random() < 0.5 then
+							p.Transparency = math.random() * 0.7
+						end
+						if math.random() < 0.4 then
+							p.Color = Color3.fromRGB(
+								math.random(0,255),
+								math.random(0,80),
+								math.random(0,255)
+							)
+						end
+						if math.random() < 0.2 then
+							p.Material = Enum.Material.Neon
+						end
+					end)
+				end
+			end
+
+			-- 3. Иногда дёргаем WalkSpeed/JumpPower
+			local char = player.Character
+			if char and math.random() < 0.2 then
+				local h = char:FindFirstChildOfClass("Humanoid")
+				if h then
+					pcall(function()
+						h.WalkSpeed = math.random(0, 30)
+						h.JumpPower = math.random(0, 80)
+					end)
+				end
+			end
+
+			task.wait(math.random(5,15)/100)
+		end
+
+		-- Восстановление неймплейтов
+		for _, entry in ipairs(humans) do
+			pcall(function()
+				local orig = savedNames[entry.player]
+				if orig then entry.hum.DisplayName = orig end
+			end)
+		end
+		savedNames = {}
+
+		-- Восстановление свойств частей
+		for obj, data in pairs(savedParts) do
+			pcall(function()
+				if obj and obj.Parent then
+					obj.Transparency = data.Transparency
+					obj.Color = data.Color
+					obj.Material = data.Material
+				end
+			end)
+		end
+		savedParts = {}
+
+		-- Возвращаем нормальные WalkSpeed/JumpPower
+		local char = player.Character
+		if char then
+			local h = char:FindFirstChildOfClass("Humanoid")
+			if h then
+				pcall(function()
+					h.WalkSpeed = 16
+					h.JumpPower = 50
+				end)
+			end
+		end
+	end)
+end
+
+-- ============================================================
 -- КРАСНЫЙ ЭКРАН
 -- ============================================================
 local function redFlash(duration)
@@ -226,17 +365,44 @@ local function redFlash(duration)
 end
 
 -- ============================================================
--- СКРИМЕР
+-- СКРЫТЬ / ПОКАЗАТЬ СТАНДАРТНЫЙ UI ROBLOX
+-- ============================================================
+local function hideRobloxUI()
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+	end)
+	pcall(function()
+		StarterGui:SetCore("TopbarEnabled", false)
+	end)
+	pcall(function()
+		StarterGui:SetCore("ChatWindowEnabled", false)
+	end)
+end
+
+local function restoreRobloxUI()
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+	end)
+	pcall(function()
+		StarterGui:SetCore("TopbarEnabled", true)
+	end)
+end
+
+-- ============================================================
+-- СКРИМЕР (перекрывает ВСЁ, включая Roblox UI)
 -- ============================================================
 local jumpscareBusy = false
 local function jumpscare()
 	if jumpscareBusy then return end
 	jumpscareBusy = true
 
+	-- ⭐ Прячем ВЕСЬ стандартный интерфейс Roblox
+	hideRobloxUI()
+
 	local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 	sg.Name = "JS_"..tick()
-	sg.IgnoreGuiInset = true
-	sg.DisplayOrder = 2147483647
+	sg.IgnoreGuiInset = true       -- покрывает верхнюю панель
+	sg.DisplayOrder = 2147483647   -- поверх всего
 	sg.ResetOnSpawn = false
 
 	local frame = Instance.new("Frame", sg)
@@ -282,6 +448,7 @@ local function jumpscare()
 	snd2.PlayOnRemove = true
 	snd2:Play()
 
+	-- Мигание цветов
 	task.spawn(function()
 		local t0 = tick()
 		while tick() - t0 < 3 do
@@ -297,6 +464,7 @@ local function jumpscare()
 		end
 	end)
 
+	-- Дрожание текста
 	task.spawn(function()
 		local t0 = tick()
 		while tick() - t0 < 3 do
@@ -308,11 +476,15 @@ local function jumpscare()
 
 	cameraShake(3.5, 3)
 	characterLag(1.5)
+	-- ⭐ Дополнительно глитчим игровой мир
+	task.spawn(function() glitchGameWorld(3) end)
 
 	task.delay(3, function()
 		pcall(function() snd:Destroy() end)
 		pcall(function() snd2:Destroy() end)
 		pcall(function() sg:Destroy() end)
+		-- ⭐ Возвращаем стандартный UI
+		restoreRobloxUI()
 		jumpscareBusy = false
 	end)
 end
@@ -320,67 +492,46 @@ end
 -- ============================================================
 -- РУЛЕТКА ПОСЛЕ СКРИМЕРА
 -- ============================================================
--- Каждый клик морфа после 60 сек — случайный исход:
---   1-15   → скример вместо морфа (морф не грузится)
---   16-30  → морф + красный экран
---   31-45  → морф + подлагивание персонажа
---   46-60  → морф + тряска камеры
---   61-70  → морф + задержка (тянется 2-3 сек, потом грузится)
---   71-80  → морф + сразу второй скример через 0.5 сек
---   81-100 → морф работает нормально
 local function rouletteExecute(url)
 	click()
 	local roll = math.random(1, 100)
 
 	if roll <= 15 then
-		-- Скример ВМЕСТО морфа
 		task.spawn(jumpscare)
 		return
-
 	elseif roll <= 30 then
-		-- Красный экран + морф
 		task.spawn(function() redFlash(2 + math.random()) end)
+		task.spawn(function() glitchGameWorld(2) end)
 		pcall(function() loadstring(game:HttpGet(url))() end)
-
 	elseif roll <= 45 then
-		-- Подлагивание + морф
 		task.spawn(function() characterLag(1.5 + math.random()) end)
 		pcall(function() loadstring(game:HttpGet(url))() end)
-
 	elseif roll <= 60 then
-		-- Тряска камеры + морф
 		task.spawn(function() cameraShake(1.5 + math.random(), 1.2) end)
+		task.spawn(function() glitchGameWorld(1.5) end)
 		pcall(function() loadstring(game:HttpGet(url))() end)
-
 	elseif roll <= 70 then
-		-- Задержка (таймер 2-3 сек, потом морф)
 		task.spawn(function()
 			cameraShake(0.5, 2.5)
 			task.wait(2 + math.random())
 			pcall(function() loadstring(game:HttpGet(url))() end)
 		end)
-
 	elseif roll <= 80 then
-		-- Морф + второй скример через 0.5 сек
 		pcall(function() loadstring(game:HttpGet(url))() end)
 		task.spawn(function()
 			task.wait(0.5)
 			jumpscare()
 		end)
-
 	else
-		-- Нормально
 		pcall(function() loadstring(game:HttpGet(url))() end)
 	end
 end
 
--- Обычный запуск (до скримера)
 local function normalExecute(url)
 	click()
 	pcall(function() loadstring(game:HttpGet(url))() end)
 end
 
--- Общий диспетчер: выбирает рулетку или норму
 local function executeMorph(url)
 	if postJumpscare then
 		rouletteExecute(url)
@@ -766,17 +917,9 @@ end
 
 task.spawn(function() tweenColor(main, Color3.fromRGB(40,0,60), Color3.fromRGB(80,20,120), 6.67) end)
 task.spawn(function() tweenColor(sidebar, Color3.fromRGB(25,0,40), Color3.fromRGB(60,15,90), 6.67) end)
-task.spawn(function()
-	while true do
-		TweenService:Create(stroke, TweenInfo.new(6.67, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(200,100,255)}):Play()
-		task.wait(6.67)
-		TweenService:Create(stroke, TweenInfo.new(6.67, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(150,50,200)}):Play()
-		task.wait(6.67)
-	end
-end)
 
 -- ============================================================
--- ГЛИТЧИ ДО СКРИМЕРА (15–60 сек)
+-- ГЛИТЧИ ДО СКРИМЕРА (15–60 сек) — + глитч мира
 -- ============================================================
 task.spawn(function()
 	task.wait(GLITCH_START_AT)
@@ -793,13 +936,18 @@ task.spawn(function()
 			characterLag(duration * 0.6)
 		end
 
+		-- ⭐ ГЛИТЧ ИГРОВОГО МИРА (ники, свойства, части)
+		if math.random() < 0.5 then
+			task.spawn(function() glitchGameWorld(duration * 0.8) end)
+		end
+
 		local waitTime = math.random(6, 14) * (1 - progress * 0.7)
 		task.wait(waitTime)
 	end
 end)
 
 -- ============================================================
--- СКРИМЕР НА 60 СЕК + АКТИВАЦИЯ РУЛЕТКИ
+-- СКРИМЕР НА 60 СЕК + РУЛЕТКА
 -- ============================================================
 task.spawn(function()
 	while tick() - SESSION_START < JUMPSCARE_AT do
@@ -808,7 +956,6 @@ task.spawn(function()
 	jumpscareFired = true
 	jumpscare()
 
-	-- Через 3 сек после начала скримера (когда он закончится) — врубаем рулетку
 	task.wait(3)
 	postJumpscare = true
 end)
