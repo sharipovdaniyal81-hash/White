@@ -1,0 +1,412 @@
+repeat task.wait() until game.Players.LocalPlayer
+
+local player = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "R6Hub"
+gui.ResetOnSpawn = false
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,0,0,0)
+main.Position = UDim2.new(0.5,0,0.5,0)
+main.AnchorPoint = Vector2.new(0.5,0.5)
+main.BackgroundColor3 = Color3.fromRGB(40,0,60)
+main.Active = true
+main.Draggable = true
+main.ClipsDescendants = true
+
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(150,50,200)
+stroke.Thickness = 2
+
+local openTween = TweenService:Create(main, TweenInfo.new(3, Enum.EasingStyle.Quart), {Size = UDim2.new(0,520,0,320)})
+openTween:Play()
+
+local function click()
+	local s = Instance.new("Sound")
+	s.SoundId = "rbxassetid://120122213964836"
+	s.Volume = 100
+	s.PlayOnRemove = true
+	s.Parent = gui
+	s:Destroy()
+end
+
+local top = Instance.new("Frame", main)
+top.Size = UDim2.new(1,0,0,35)
+top.BackgroundColor3 = Color3.fromRGB(30,0,45)
+
+local title = Instance.new("TextLabel", top)
+title.Size = UDim2.new(1,-50,1,0)
+title.Position = UDim2.new(0,10,0,0)
+title.BackgroundTransparency = 1
+title.Text = ".̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋.̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋.̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋"
+title.TextColor3 = Color3.fromRGB(230,230,230)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.TextScaled = false
+title.TextWrapped = false
+title.ClipsDescendants = true
+
+local toggleBtn = Instance.new("TextButton", top)
+toggleBtn.Size = UDim2.new(0,25,0,25)
+toggleBtn.Position = UDim2.new(1,-30,0,5)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
+toggleBtn.Text = "X"
+toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 14
+toggleBtn.AutoButtonColor = false
+toggleBtn.BorderSizePixel = 0
+
+local isOpen = true
+
+toggleBtn.MouseButton1Click:Connect(function()
+	click()
+	if isOpen then
+		TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {Size = UDim2.new(0,520,0,35)}):Play()
+		toggleBtn.Text = "+"
+		isOpen = false
+	else
+		TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {Size = UDim2.new(0,520,0,320)}):Play()
+		toggleBtn.Text = "X"
+		isOpen = true
+	end
+end)
+
+local sidebar = Instance.new("Frame", main)
+sidebar.Size = UDim2.new(0,110,1,-35)
+sidebar.Position = UDim2.new(0,0,0,35)
+sidebar.BackgroundColor3 = Color3.fromRGB(25,0,40)
+
+local pages = Instance.new("Frame", main)
+pages.Size = UDim2.new(1,-110,1,-35)
+pages.Position = UDim2.new(0,110,0,35)
+pages.BackgroundTransparency = 1
+pages.ClipsDescendants = true
+
+local function tab(text,y)
+	local b = Instance.new("TextButton", sidebar)
+	b.Size = UDim2.new(1,-10,0,40)
+	b.Position = UDim2.new(0,5,0,y)
+	b.Text = text
+	b.BackgroundColor3 = Color3.fromRGB(70,0,100)
+	b.TextColor3 = Color3.fromRGB(255,255,255)
+	b.Font = Enum.Font.Gotham
+	b.TextSize = 13
+	b.MouseButton1Click:Connect(click)
+	return b
+end
+
+local homeBtn = tab("Home",5)
+local morphsBtn = tab("Morphs",50)
+local miscBtn = tab("Misc",95)
+local guiBtn = tab("GUI",140)
+
+local folder = Instance.new("Folder", pages)
+
+local function page()
+	local f = Instance.new("Frame", folder)
+	f.Size = UDim2.new(1,0,1,0)
+	f.BackgroundTransparency = 1
+	f.Visible = false
+	f.ClipsDescendants = true
+	return f
+end
+
+local home = page()
+local morphs = page()
+local misc = page()
+local guiPage = page()
+home.Visible = true
+
+local function switch(p)
+	for _,v in pairs(folder:GetChildren()) do v.Visible=false end
+	p.Visible = true
+end
+
+homeBtn.MouseButton1Click:Connect(function() switch(home) end)
+morphsBtn.MouseButton1Click:Connect(function() switch(morphs) end)
+miscBtn.MouseButton1Click:Connect(function() switch(misc) end)
+guiBtn.MouseButton1Click:Connect(function() switch(guiPage) end)
+
+local name = Instance.new("TextLabel", home)
+name.Size = UDim2.new(1,-20,0,25)
+name.Position = UDim2.new(0,10,0,10)
+name.BackgroundTransparency = 1
+name.Text = player.Name
+name.TextSize = 14
+name.TextColor3 = Color3.fromRGB(230,230,230)
+name.Font = Enum.Font.GothamBold
+name.TextXAlignment = Enum.TextXAlignment.Left
+
+local id = Instance.new("TextLabel", home)
+id.Size = UDim2.new(1,-20,0,20)
+id.Position = UDim2.new(0,10,0,35)
+id.BackgroundTransparency = 1
+id.Text = "ID: "..player.UserId
+id.TextSize = 13
+id.TextColor3 = Color3.fromRGB(180,180,180)
+id.Font = Enum.Font.Gotham
+id.TextXAlignment = Enum.TextXAlignment.Left
+
+local credit = Instance.new("TextLabel", home)
+credit.Size = UDim2.new(1,-10,0,20)
+credit.Position = UDim2.new(0,5,1,-44)
+credit.BackgroundTransparency = 1
+credit.Text = "by Sec00925"
+credit.TextSize = 12
+credit.TextColor3 = Color3.fromRGB(120,120,120)
+credit.Font = Enum.Font.Gotham
+
+local tiktok = Instance.new("TextLabel", home)
+tiktok.Size = UDim2.new(1,-10,0,20)
+tiktok.Position = UDim2.new(0,5,1,-22)
+tiktok.BackgroundTransparency = 1
+tiktok.Text = "Me on TikTok: Sec00925script"
+tiktok.TextSize = 12
+tiktok.TextColor3 = Color3.fromRGB(180,120,220)
+tiktok.Font = Enum.Font.Gotham
+
+local morphsContainer = Instance.new("Frame", morphs)
+morphsContainer.Size = UDim2.new(1,-20,1,-20)
+morphsContainer.Position = UDim2.new(0,10,0,10)
+morphsContainer.BackgroundColor3 = Color3.fromRGB(20,0,35)
+morphsContainer.ClipsDescendants = true
+
+local morphsLabel = Instance.new("TextLabel", morphsContainer)
+morphsLabel.Size = UDim2.new(1,0,0,30)
+morphsLabel.BackgroundTransparency = 1
+morphsLabel.Text = "Morphs"
+morphsLabel.TextColor3 = Color3.fromRGB(255,255,255)
+morphsLabel.Font = Enum.Font.GothamBold
+morphsLabel.TextSize = 16
+morphsLabel.TextXAlignment = Enum.TextXAlignment.Left
+morphsLabel.Position = UDim2.new(0,10,0,5)
+
+local morphsScroll = Instance.new("ScrollingFrame", morphsContainer)
+morphsScroll.Size = UDim2.new(1,0,1,-40)
+morphsScroll.Position = UDim2.new(0,0,0,35)
+morphsScroll.BackgroundTransparency = 1
+morphsScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+morphsScroll.ScrollBarThickness = 4
+
+local morphsGrid = Instance.new("UIGridLayout", morphsScroll)
+morphsGrid.CellSize = UDim2.new(0.9,0,0,30)
+morphsGrid.CellPadding = UDim2.new(0,5,0,5)
+morphsGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local function addMorphButton(name, url)
+	local btn = Instance.new("TextButton", morphsScroll)
+	btn.Size = UDim2.new(1,0,1,0)
+	btn.Text = name
+	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	btn.TextColor3 = Color3.fromRGB(230,230,230)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 13
+	btn.MouseButton1Click:Connect(function()
+		click()
+		loadstring(game:HttpGet(url))()
+	end)
+end
+
+addMorphButton("Terra God", "https://pastebin.com/raw/c8rm3KUT")
+addMorphButton("Shrike", "https://pastebin.com/raw/L9s88W5u")
+addMorphButton("Burning Hope", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Burning%20Hope")
+addMorphButton("Lost Hope Scythe", "https://pastebin.com/raw/UYM7Lx4n")
+addMorphButton("Sin Dragon", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Sin%20Dragon.lua")
+addMorphButton("Goner", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Goner/refs/heads/main/Goner")
+addMorphButton("Internal war", "https://pastebin.com/raw/tiDrRmiz")
+addMorphButton("Blind Reaper", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/BLINDREAPER")
+addMorphButton("Chrono Sentinel", "https://raw.githubusercontent.com/Lock1213/Scripts/refs/heads/main/Chrono%20Sentinel%20(Converted%20With%20Music)")
+addMorphButton("Dual Ultima", "https://pastebin.com/raw/3QsB07Ba")
+addMorphButton("Comedic Chaos", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Comedy")
+addMorphButton("Road Rogue", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Road-Rogue/refs/heads/main/Road%20Rogue")
+addMorphButton("God Slayer", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/God%20Eater")
+addMorphButton("Xester", "https://raw.githubusercontent.com/Icalock/Server/refs/heads/main/Xester%20FD.txt")
+addMorphButton("Ban Hammer", "https://pastebin.com/raw/xLHUcVjx")
+addMorphButton("The Last God", "https://pastebin.com/raw/TLWkKzPH")
+addMorphButton("Red S+", "https://pastebin.com/raw/bmKGtHQF")
+addMorphButton("Red Ultima", "https://pastebin.com/raw/njqct98T")
+addMorphButton("Black Dominus", "https://pastebin.com/raw/qAkxQx18")
+addMorphButton("Vereus", "https://rawscripts.net/raw/Universal-Script-Roblox-VEREUS-monster-script-3746")
+addMorphButton("Killbot", "https://pastebin.com/raw/8spCXuEU")
+addMorphButton("Killbot V2", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/KillbotV2")
+addMorphButton("Rebellion", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Pharoh")
+addMorphButton("Neptunian V", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/NepV")
+addMorphButton("Caducus", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/CADUCUS%20(FIXED)")
+addMorphButton("Ruin EX", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/RUIN%20EX")
+addMorphButton("Ender", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Ender")
+addMorphButton("Brick hamman", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Brick-hamman/refs/heads/main/Brick%20hamman")
+addMorphButton("Cleetus", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Cleetus/refs/heads/main/Cleetus")
+addMorphButton("Genkaada Omega Sword", "https://raw.githubusercontent.com/nicolasbarbosa323/grakkeda/refs/heads/main/Roblox%20Genkadda%20omega%20leaked.txt")
+addMorphButton("Devil Glove", "https://pastebin.com/raw/GZWtWL0y")
+addMorphButton("Chaotic God", "https://pastebin.com/raw/ygMBF5G6")
+addMorphButton("Green wings", "https://pastebin.com/raw/X3Y7adwk")
+addMorphButton("Blue Sickle", "https://pastebin.com/raw/Yk5xGGyD")
+addMorphButton("Legendary Sickle", "https://pastebin.com/raw/7qNpiSQs")
+addMorphButton("X sword", "https://pastebin.com/raw/6dw0wuc1")
+addMorphButton("Purple Sword", "https://pastebin.com/raw/kC0DdRS7")
+addMorphButton("Omni God", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God")
+addMorphButton("Zenatic", "https://pastebin.com/raw/8WiaahB7")
+addMorphButton("Iron hand", "https://pastebin.com/raw/0HKHHPJV")
+addMorphButton("All Seeing Hand", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand")
+addMorphButton("Oculus", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Oculus")
+addMorphButton("Determination", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Determination")
+addMorphButton("Hacker X", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Hacker%20X")
+addMorphButton("Rainbow Glowe", "https://pastebin.com/raw/G9y0Nu2h")
+addMorphButton("Banisher", "https://pastebin.com/raw/nHN5eMQx")
+addMorphButton("White sickle", "https://pastebin.com/raw/xHaWXEqA")
+addMorphButton("Rainbow King", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher")
+addMorphButton("Spectrum Glitcher", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/sr")
+addMorphButton("John doe", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/John-doe/refs/heads/main/John%20doe")
+addMorphButton("Mr bye bye", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Mr-bye-bye/refs/heads/main/Mr%20bye%20bye")
+addMorphButton("Hallow Slayer", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/HSlayer")
+addMorphButton("Lunatic", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/lunatic")
+addMorphButton("Refulgence", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/light")
+addMorphButton("Sukuna", "https://pastebin.com/raw/iW2Gg6Hh")
+addMorphButton("Ultimate Dominus", "https://pastebin.com/raw/gBFyvYzQ")
+addMorphButton("Mr.pixels", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Mr.Pixels.lua")
+addMorphButton("Purple Hand", "https://pastebin.com/raw/cF3S1FVV")
+addMorphButton("Rainbow Glowe", "https://pastebin.com/raw/377urnW7")
+addMorphButton("Love Glowe", "https://pastebin.com/raw/AaNuC7H8")
+addMorphButton("Pumpkin Overseer", "https://pastebin.com/raw/sX25byLe")
+addMorphButton("Kitchen gun", "https://raw.githubusercontent.com/nicolasbarbosa323/rare/refs/heads/main/kitcher%20gun.lua")
+addMorphButton("Red Sin dragon", "https://raw.githubusercontent.com/nicolasbarbosa323/sin-dragon/refs/heads/main/Fe_sin_dragon_music_customizado_final.lua")
+addMorphButton("Gaster hands", "https://raw.githubusercontent.com/nicolasbarbosa323/good-cop-bad-coop/refs/heads/main/GasterHands.txt")
+addMorphButton("Galaxy banisher gun", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Galaxy-banisher-gun/refs/heads/main/Galaxy%20banisher")
+addMorphButton("John Doe (Remake)", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
+addMorphButton("Xester (Remake)", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
+
+local hacklordBtn = Instance.new("TextButton", morphsScroll)
+hacklordBtn.Size = UDim2.new(1,0,1,0)
+hacklordBtn.Text = "Hacklord"
+hacklordBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+hacklordBtn.TextColor3 = Color3.fromRGB(230,230,230)
+hacklordBtn.Font = Enum.Font.Gotham
+hacklordBtn.TextSize = 13
+hacklordBtn.MouseButton1Click:Connect(function()
+	click()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/sharipovdaniyal81-hash/Hacklord/refs/heads/main/Hacklord"))()
+end)
+
+local miscContainer = Instance.new("Frame", misc)
+miscContainer.Size = UDim2.new(1,-20,1,-20)
+miscContainer.Position = UDim2.new(0,10,0,10)
+miscContainer.BackgroundColor3 = Color3.fromRGB(20,0,35)
+miscContainer.ClipsDescendants = true
+
+local miscLabel = Instance.new("TextLabel", miscContainer)
+miscLabel.Size = UDim2.new(1,0,0,30)
+miscLabel.BackgroundTransparency = 1
+miscLabel.Text = "Misc"
+miscLabel.TextColor3 = Color3.fromRGB(255,255,255)
+miscLabel.Font = Enum.Font.GothamBold
+miscLabel.TextSize = 16
+miscLabel.TextXAlignment = Enum.TextXAlignment.Left
+miscLabel.Position = UDim2.new(0,10,0,5)
+
+local miscScroll = Instance.new("ScrollingFrame", miscContainer)
+miscScroll.Size = UDim2.new(1,0,1,-40)
+miscScroll.Position = UDim2.new(0,0,0,35)
+miscScroll.BackgroundTransparency = 1
+miscScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+miscScroll.ScrollBarThickness = 4
+
+local miscGrid = Instance.new("UIGridLayout", miscScroll)
+miscGrid.CellSize = UDim2.new(0.9,0,0,30)
+miscGrid.CellPadding = UDim2.new(0,5,0,5)
+miscGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local function addMiscButton(name, url)
+	local btn = Instance.new("TextButton", miscScroll)
+	btn.Size = UDim2.new(1,0,1,0)
+	btn.Text = name
+	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	btn.TextColor3 = Color3.fromRGB(230,230,230)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 13
+	btn.MouseButton1Click:Connect(function()
+		click()
+		loadstring(game:HttpGet(url))()
+	end)
+end
+
+addMiscButton("Keyboard", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
+addMiscButton("R6", "https://raw.githubusercontent.com/LeathalMurd/Roblox-R15-To-R6/refs/heads/main/Converter.lua")
+
+local guiContainer = Instance.new("Frame", guiPage)
+guiContainer.Size = UDim2.new(1,-20,1,-20)
+guiContainer.Position = UDim2.new(0,10,0,10)
+guiContainer.BackgroundColor3 = Color3.fromRGB(20,0,35)
+guiContainer.ClipsDescendants = true
+
+local guiLabel = Instance.new("TextLabel", guiContainer)
+guiLabel.Size = UDim2.new(1,0,0,30)
+guiLabel.BackgroundTransparency = 1
+guiLabel.Text = "GUI"
+guiLabel.TextColor3 = Color3.fromRGB(255,255,255)
+guiLabel.Font = Enum.Font.GothamBold
+guiLabel.TextSize = 16
+guiLabel.TextXAlignment = Enum.TextXAlignment.Left
+guiLabel.Position = UDim2.new(0,10,0,5)
+
+local guiScroll = Instance.new("ScrollingFrame", guiContainer)
+guiScroll.Size = UDim2.new(1,0,1,-40)
+guiScroll.Position = UDim2.new(0,0,0,35)
+guiScroll.BackgroundTransparency = 1
+guiScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+guiScroll.ScrollBarThickness = 4
+
+local guiGrid = Instance.new("UIGridLayout", guiScroll)
+guiGrid.CellSize = UDim2.new(0.9,0,0,30)
+guiGrid.CellPadding = UDim2.new(0,5,0,5)
+guiGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local function addGuiButton(name, url)
+	local btn = Instance.new("TextButton", guiScroll)
+	btn.Size = UDim2.new(1,0,1,0)
+	btn.Text = name
+	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	btn.TextColor3 = Color3.fromRGB(230,230,230)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 13
+	btn.MouseButton1Click:Connect(function()
+		click()
+		loadstring(game:HttpGet(url))()
+	end)
+end
+
+addGuiButton("Fly GUI", "https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui")
+addGuiButton("NPS Spawner", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
+
+local function tweenColor(object, color1, color2, duration)
+	while true do
+		TweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear), {BackgroundColor3 = color2}):Play()
+		task.wait(duration)
+		TweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear), {BackgroundColor3 = color1}):Play()
+		task.wait(duration)
+	end
+end
+
+local darkPurple = Color3.fromRGB(40,0,60)
+local lightPurple = Color3.fromRGB(80,20,120)
+local darkSide = Color3.fromRGB(25,0,40)
+local lightSide = Color3.fromRGB(60,15,90)
+
+local duration = 6.67
+
+task.spawn(function() tweenColor(main, darkPurple, lightPurple, duration) end)
+task.spawn(function() tweenColor(sidebar, darkSide, lightSide, duration) end)
+
+local strokeColor1 = Color3.fromRGB(150,50,200)
+local strokeColor2 = Color3.fromRGB(200,100,255)
+task.spawn(function()
+	while true do
+		TweenService:Create(stroke, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Color = strokeColor2}):Play()
+		task.wait(duration)
+		TweenService:Create(stroke, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Color = strokeColor1}):Play()
+		task.wait(duration)
+	end
+end)
