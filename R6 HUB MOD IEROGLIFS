@@ -20,8 +20,7 @@ local stroke = Instance.new("UIStroke", main)
 stroke.Color = Color3.fromRGB(150,50,200)
 stroke.Thickness = 2
 
-local openTween = TweenService:Create(main, TweenInfo.new(3, Enum.EasingStyle.Quart), {Size = UDim2.new(0,520,0,320)})
-openTween:Play()
+TweenService:Create(main, TweenInfo.new(3, Enum.EasingStyle.Quart), {Size = UDim2.new(0,520,0,320)}):Play()
 
 local function click()
 	local s = Instance.new("Sound")
@@ -40,14 +39,11 @@ local title = Instance.new("TextLabel", top)
 title.Size = UDim2.new(1,-50,1,0)
 title.Position = UDim2.new(0,10,0,0)
 title.BackgroundTransparency = 1
-title.Text = ".̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋.̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋.̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋"
+title.Text = ".̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋"
 title.TextColor3 = Color3.fromRGB(230,230,230)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 16
 title.TextXAlignment = Enum.TextXAlignment.Left
-title.TextScaled = false
-title.TextWrapped = false
-title.ClipsDescendants = true
 
 local toggleBtn = Instance.new("TextButton", top)
 toggleBtn.Size = UDim2.new(0,25,0,25)
@@ -94,15 +90,15 @@ local function tab(text,y)
 	b.BackgroundColor3 = Color3.fromRGB(70,0,100)
 	b.TextColor3 = Color3.fromRGB(255,255,255)
 	b.Font = Enum.Font.Gotham
-	b.TextSize = 13
+	b.TextSize = 12
 	b.MouseButton1Click:Connect(click)
 	return b
 end
 
-local homeBtn = tab("Home",5)
-local morphsBtn = tab("Morphs",50)
-local miscBtn = tab("Misc",95)
-local guiBtn = tab("GUI",140)
+local homeBtn = tab("H̷̛̜̏̾̔ǒ̶̖̙̎̐m̸̟̯̄̆̉é̵̳̺̒̚",5)
+local morphsBtn = tab("M̷̛̜̏̾̔ǒ̶̖̙̎̐r̸̟̯̄̆̉ṕ̵̳̺̒̚ḧ̴̫́̽̿̂s̷̛̜̏̾̔",50)
+local miscBtn = tab("M̶̖̙̌̎̐ī̸̟̯̆̉ś̵̳̺̒̚c̴̫̈́̽̿̂",95)
+local guiBtn = tab("G̷̛̜̏̾̔Ǔ̶̖̙̎̐Ī̸̟̯̆̉",140)
 
 local folder = Instance.new("Folder", pages)
 
@@ -145,7 +141,7 @@ local id = Instance.new("TextLabel", home)
 id.Size = UDim2.new(1,-20,0,20)
 id.Position = UDim2.new(0,10,0,35)
 id.BackgroundTransparency = 1
-id.Text = "ID: "..player.UserId
+id.Text = "Ȉ̷̛̜̾̔Ď̶̖̙̎̐:̸̟̯̄̆̉ "..player.UserId
 id.TextSize = 13
 id.TextColor3 = Color3.fromRGB(180,180,180)
 id.Font = Enum.Font.Gotham
@@ -155,7 +151,7 @@ local credit = Instance.new("TextLabel", home)
 credit.Size = UDim2.new(1,-10,0,20)
 credit.Position = UDim2.new(0,5,1,-44)
 credit.BackgroundTransparency = 1
-credit.Text = "by Sec00925"
+credit.Text = "b̷̛̜̏̾̔y̶̖̙̌̎̐ S̸̟̯̄̆̉é̵̳̺̒̚c̴̫̈́̽̿̂0̷̛̜̏̾̔0̶̖̙̌̎̐9̸̟̯̄̆̉2̵̳̺́̒̚5̴̫̈́̽̿̂"
 credit.TextSize = 12
 credit.TextColor3 = Color3.fromRGB(120,120,120)
 credit.Font = Enum.Font.Gotham
@@ -164,7 +160,7 @@ local tiktok = Instance.new("TextLabel", home)
 tiktok.Size = UDim2.new(1,-10,0,20)
 tiktok.Position = UDim2.new(0,5,1,-22)
 tiktok.BackgroundTransparency = 1
-tiktok.Text = "Me on TikTok: Sec00925script"
+tiktok.Text = "M̷̛̜̏̾̔ě̶̖̙̎̐ ō̸̟̯̆̉ń̵̳̺̒̚ T̴̫̈́̽̿̂ȉ̷̛̜̾̔ǩ̶̖̙̎̐T̸̟̯̄̆̉ó̵̳̺̒̚k̴̫̈́̽̿̂:̷̛̜̏̾̔ Š̶̖̙̎̐ē̸̟̯̆̉ć̵̳̺̒̚0̴̫̈́̽̿̂0̷̛̜̏̾̔9̶̖̙̌̎̐2̸̟̯̄̆̉5̵̳̺́̒̚s̴̫̈́̽̿̂c̷̛̜̏̾̔ř̶̖̙̎̐ī̸̟̯̆̉ṕ̵̳̺̒̚ẗ̴̫́̽̿̂"
 tiktok.TextSize = 12
 tiktok.TextColor3 = Color3.fromRGB(180,120,220)
 tiktok.Font = Enum.Font.Gotham
@@ -178,7 +174,7 @@ morphsContainer.ClipsDescendants = true
 local morphsLabel = Instance.new("TextLabel", morphsContainer)
 morphsLabel.Size = UDim2.new(1,0,0,30)
 morphsLabel.BackgroundTransparency = 1
-morphsLabel.Text = "Morphs"
+morphsLabel.Text = "M̷̛̜̏̾̔ǒ̶̖̙̎̐r̸̟̯̄̆̉ṕ̵̳̺̒̚ḧ̴̫́̽̿̂s̷̛̜̏̾̔"
 morphsLabel.TextColor3 = Color3.fromRGB(255,255,255)
 morphsLabel.Font = Enum.Font.GothamBold
 morphsLabel.TextSize = 16
@@ -211,77 +207,76 @@ local function addMorphButton(name, url)
 	end)
 end
 
-addMorphButton("Terra God", "https://pastebin.com/raw/c8rm3KUT")
-addMorphButton("Shrike", "https://pastebin.com/raw/L9s88W5u")
-addMorphButton("Burning Hope", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Burning%20Hope")
-addMorphButton("Lost Hope Scythe", "https://pastebin.com/raw/UYM7Lx4n")
-addMorphButton("Sin Dragon", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Sin%20Dragon.lua")
-addMorphButton("Goner", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Goner/refs/heads/main/Goner")
-addMorphButton("Internal war", "https://pastebin.com/raw/tiDrRmiz")
-addMorphButton("Blind Reaper", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/BLINDREAPER")
-addMorphButton("Chrono Sentinel", "https://raw.githubusercontent.com/Lock1213/Scripts/refs/heads/main/Chrono%20Sentinel%20(Converted%20With%20Music)")
-addMorphButton("Dual Ultima", "https://pastebin.com/raw/3QsB07Ba")
-addMorphButton("Comedic Chaos", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Comedy")
-addMorphButton("Road Rogue", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Road-Rogue/refs/heads/main/Road%20Rogue")
-addMorphButton("God Slayer", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/God%20Eater")
-addMorphButton("Xester", "https://raw.githubusercontent.com/Icalock/Server/refs/heads/main/Xester%20FD.txt")
-addMorphButton("Ban Hammer", "https://pastebin.com/raw/xLHUcVjx")
-addMorphButton("The Last God", "https://pastebin.com/raw/TLWkKzPH")
-addMorphButton("Red S+", "https://pastebin.com/raw/bmKGtHQF")
-addMorphButton("Red Ultima", "https://pastebin.com/raw/njqct98T")
-addMorphButton("Black Dominus", "https://pastebin.com/raw/qAkxQx18")
-addMorphButton("Vereus", "https://rawscripts.net/raw/Universal-Script-Roblox-VEREUS-monster-script-3746")
-addMorphButton("Killbot", "https://pastebin.com/raw/8spCXuEU")
-addMorphButton("Killbot V2", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/KillbotV2")
-addMorphButton("Rebellion", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Pharoh")
-addMorphButton("Neptunian V", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/NepV")
-addMorphButton("Caducus", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/CADUCUS%20(FIXED)")
-addMorphButton("Ruin EX", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/RUIN%20EX")
-addMorphButton("Ender", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Ender")
-addMorphButton("Brick hamman", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Brick-hamman/refs/heads/main/Brick%20hamman")
-addMorphButton("Cleetus", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Cleetus/refs/heads/main/Cleetus")
-addMorphButton("Genkaada Omega Sword", "https://raw.githubusercontent.com/nicolasbarbosa323/grakkeda/refs/heads/main/Roblox%20Genkadda%20omega%20leaked.txt")
-addMorphButton("Devil Glove", "https://pastebin.com/raw/GZWtWL0y")
-addMorphButton("Chaotic God", "https://pastebin.com/raw/ygMBF5G6")
-addMorphButton("Green wings", "https://pastebin.com/raw/X3Y7adwk")
-addMorphButton("Blue Sickle", "https://pastebin.com/raw/Yk5xGGyD")
-addMorphButton("Legendary Sickle", "https://pastebin.com/raw/7qNpiSQs")
-addMorphButton("X sword", "https://pastebin.com/raw/6dw0wuc1")
-addMorphButton("Purple Sword", "https://pastebin.com/raw/kC0DdRS7")
-addMorphButton("Omni God", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God")
-addMorphButton("Zenatic", "https://pastebin.com/raw/8WiaahB7")
-addMorphButton("Iron hand", "https://pastebin.com/raw/0HKHHPJV")
-addMorphButton("All Seeing Hand", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand")
-addMorphButton("Oculus", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Oculus")
-addMorphButton("Determination", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Determination")
-addMorphButton("Hacker X", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Hacker%20X")
-addMorphButton("Rainbow Glowe", "https://pastebin.com/raw/G9y0Nu2h")
-addMorphButton("Banisher", "https://pastebin.com/raw/nHN5eMQx")
-addMorphButton("White sickle", "https://pastebin.com/raw/xHaWXEqA")
-addMorphButton("Rainbow King", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher")
-addMorphButton("Spectrum Glitcher", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/sr")
-addMorphButton("John doe", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/John-doe/refs/heads/main/John%20doe")
-addMorphButton("Mr bye bye", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Mr-bye-bye/refs/heads/main/Mr%20bye%20bye")
-addMorphButton("Hallow Slayer", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/HSlayer")
-addMorphButton("Lunatic", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/lunatic")
-addMorphButton("Refulgence", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/light")
-addMorphButton("Sukuna", "https://pastebin.com/raw/iW2Gg6Hh")
-addMorphButton("Ultimate Dominus", "https://pastebin.com/raw/gBFyvYzQ")
-addMorphButton("Mr.pixels", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Mr.Pixels.lua")
-addMorphButton("Purple Hand", "https://pastebin.com/raw/cF3S1FVV")
-addMorphButton("Rainbow Glowe", "https://pastebin.com/raw/377urnW7")
-addMorphButton("Love Glowe", "https://pastebin.com/raw/AaNuC7H8")
-addMorphButton("Pumpkin Overseer", "https://pastebin.com/raw/sX25byLe")
-addMorphButton("Kitchen gun", "https://raw.githubusercontent.com/nicolasbarbosa323/rare/refs/heads/main/kitcher%20gun.lua")
-addMorphButton("Red Sin dragon", "https://raw.githubusercontent.com/nicolasbarbosa323/sin-dragon/refs/heads/main/Fe_sin_dragon_music_customizado_final.lua")
-addMorphButton("Gaster hands", "https://raw.githubusercontent.com/nicolasbarbosa323/good-cop-bad-coop/refs/heads/main/GasterHands.txt")
-addMorphButton("Galaxy banisher gun", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Galaxy-banisher-gun/refs/heads/main/Galaxy%20banisher")
-addMorphButton("John Doe (Remake)", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
-addMorphButton("Xester (Remake)", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
+addMorphButton("T̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉ŕ̵̳̺̒̚ä̴̫́̽̿̂ G̷̛̜̏̾̔ǒ̶̖̙̎̐d̸̟̯̄̆̉", "https://pastebin.com/raw/c8rm3KUT")
+addMorphButton("Ś̵̳̺̒̚ḧ̴̫́̽̿̂ȑ̷̛̜̾̔ǐ̶̖̙̎̐k̸̟̯̄̆̉é̵̳̺̒̚", "https://pastebin.com/raw/L9s88W5u")
+addMorphButton("B̴̫̈́̽̿̂ư̷̜̏̾̔ř̶̖̙̎̐n̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂g̷̛̜̏̾̔ Ȟ̶̖̙̎̐ō̸̟̯̆̉ṕ̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Burning%20Hope")
+addMorphButton("L̷̛̜̏̾̔ǒ̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ Ḧ̴̫́̽̿̂ơ̷̜̏̾̔p̶̖̙̌̎̐ē̸̟̯̆̉ Ś̵̳̺̒̚c̴̫̈́̽̿̂y̷̛̜̏̾̔ť̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚", "https://pastebin.com/raw/UYM7Lx4n")
+addMorphButton("S̴̫̈́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ D̸̟̯̄̆̉ŕ̵̳̺̒̚ä̴̫́̽̿̂g̷̛̜̏̾̔ǒ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Sin%20Dragon.lua")
+addMorphButton("Ǵ̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Goner/refs/heads/main/Goner")
+addMorphButton("Í̵̳̺̒̚n̴̫̈́̽̿̂t̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉ń̵̳̺̒̚ä̴̫́̽̿̂l̷̛̜̏̾̔ w̶̖̙̌̎̐ā̸̟̯̆̉ŕ̵̳̺̒̚", "https://pastebin.com/raw/tiDrRmiz")
+addMorphButton("B̴̫̈́̽̿̂l̷̛̜̏̾̔ǐ̶̖̙̎̐n̸̟̯̄̆̉d̵̳̺́̒̚ R̴̫̈́̽̿̂ȅ̷̛̜̾̔ǎ̶̖̙̎̐p̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/BLINDREAPER")
+addMorphButton("C̷̛̜̏̾̔ȟ̶̖̙̎̐r̸̟̯̄̆̉ó̵̳̺̒̚n̴̫̈́̽̿̂ơ̷̜̏̾̔ Š̶̖̙̎̐ē̸̟̯̆̉ń̵̳̺̒̚ẗ̴̫́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ē̸̟̯̆̉ĺ̵̳̺̒̚", "https://raw.githubusercontent.com/Lock1213/Scripts/refs/heads/main/Chrono%20Sentinel%20(Converted%20With%20Music)")
+addMorphButton("D̴̫̈́̽̿̂ư̷̜̏̾̔ǎ̶̖̙̎̐l̸̟̯̄̆̉ Ú̵̳̺̒̚l̴̫̈́̽̿̂t̷̛̜̏̾̔ǐ̶̖̙̎̐m̸̟̯̄̆̉á̵̳̺̒̚", "https://pastebin.com/raw/3QsB07Ba")
+addMorphButton("C̴̫̈́̽̿̂ơ̷̜̏̾̔m̶̖̙̌̎̐ē̸̟̯̆̉d̵̳̺́̒̚ḯ̴̫̽̿̂c̷̛̜̏̾̔ Č̶̖̙̎̐h̸̟̯̄̆̉á̵̳̺̒̚ö̴̫́̽̿̂s̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Comedy")
+addMorphButton("Ř̶̖̙̎̐ō̸̟̯̆̉á̵̳̺̒̚d̴̫̈́̽̿̂ Ȑ̷̛̜̾̔ǒ̶̖̙̎̐ḡ̸̟̯̆̉ú̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Road-Rogue/refs/heads/main/Road%20Rogue")
+addMorphButton("G̷̛̜̏̾̔ǒ̶̖̙̎̐d̸̟̯̄̆̉ Ś̵̳̺̒̚l̴̫̈́̽̿̂ȁ̷̛̜̾̔y̶̖̙̌̎̐ē̸̟̯̆̉ŕ̵̳̺̒̚", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/God%20Eater")
+addMorphButton("Ẍ̴̫́̽̿̂ȅ̷̛̜̾̔š̶̖̙̎̐t̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂", "https://raw.githubusercontent.com/Icalock/Server/refs/heads/main/Xester%20FD.txt")
+addMorphButton("B̷̛̜̏̾̔ǎ̶̖̙̎̐n̸̟̯̄̆̉ H̵̳̺́̒̚ä̴̫́̽̿̂m̷̛̜̏̾̔m̶̖̙̌̎̐ē̸̟̯̆̉ŕ̵̳̺̒̚", "https://pastebin.com/raw/xLHUcVjx")
+addMorphButton("T̴̫̈́̽̿̂h̷̛̜̏̾̔ě̶̖̙̎̐ L̸̟̯̄̆̉á̵̳̺̒̚s̴̫̈́̽̿̂t̷̛̜̏̾̔ Ǧ̶̖̙̎̐ō̸̟̯̆̉d̵̳̺́̒̚", "https://pastebin.com/raw/TLWkKzPH")
+addMorphButton("R̴̫̈́̽̿̂ȅ̷̛̜̾̔ď̶̖̙̎̐ S̸̟̯̄̆̉+̵̳̺́̒̚", "https://pastebin.com/raw/bmKGtHQF")
+addMorphButton("Ŕ̵̳̺̒̚ë̴̫́̽̿̂d̷̛̜̏̾̔ Ǔ̶̖̙̎̐l̸̟̯̄̆̉t̵̳̺́̒̚ḯ̴̫̽̿̂m̷̛̜̏̾̔ǎ̶̖̙̎̐", "https://pastebin.com/raw/njqct98T")
+addMorphButton("B̸̟̯̄̆̉ĺ̵̳̺̒̚ä̴̫́̽̿̂c̷̛̜̏̾̔ǩ̶̖̙̎̐ D̸̟̯̄̆̉ó̵̳̺̒̚m̴̫̈́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ū̸̟̯̆̉ś̵̳̺̒̚", "https://pastebin.com/raw/qAkxQx18")
+addMorphButton("V̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉é̵̳̺̒̚ǘ̴̫̽̿̂s̷̛̜̏̾̔", "https://rawscripts.net/raw/Universal-Script-Roblox-VEREUS-monster-script-3746")
+addMorphButton("Ǩ̶̖̙̎̐ī̸̟̯̆̉ĺ̵̳̺̒̚l̴̫̈́̽̿̂b̷̛̜̏̾̔ǒ̶̖̙̎̐t̸̟̯̄̆̉", "https://pastebin.com/raw/8spCXuEU")
+addMorphButton("K̴̫̈́̽̿̂ȉ̷̛̜̾̔ľ̶̖̙̎̐l̸̟̯̄̆̉b̵̳̺́̒̚ö̴̫́̽̿̂t̷̛̜̏̾̔ V̶̖̙̌̎̐2̸̟̯̄̆̉", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/KillbotV2")
+addMorphButton("R̸̟̯̄̆̉é̵̳̺̒̚b̴̫̈́̽̿̂ȅ̷̛̜̾̔ľ̶̖̙̎̐l̸̟̯̄̆̉í̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Pharoh")
+addMorphButton("Ň̶̖̙̎̐ē̸̟̯̆̉ṕ̵̳̺̒̚ẗ̴̫́̽̿̂ư̷̜̏̾̔ň̶̖̙̎̐ī̸̟̯̆̉á̵̳̺̒̚n̴̫̈́̽̿̂ V̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/NepV")
+addMorphButton("Ć̵̳̺̒̚ä̴̫́̽̿̂d̷̛̜̏̾̔ǔ̶̖̙̎̐c̸̟̯̄̆̉ú̵̳̺̒̚s̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/CADUCUS%20(FIXED)")
+addMorphButton("Ȑ̷̛̜̾̔ǔ̶̖̙̎̐ī̸̟̯̆̉ń̵̳̺̒̚ Ë̴̫́̽̿̂X̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/RUIN%20EX")
+addMorphButton("Ě̶̖̙̎̐n̸̟̯̄̆̉d̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Ender")
+addMorphButton("B̴̫̈́̽̿̂ȑ̷̛̜̾̔ǐ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚ ḧ̴̫́̽̿̂ȁ̷̛̜̾̔m̶̖̙̌̎̐m̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Brick-hamman/refs/heads/main/Brick%20hamman")
+addMorphButton("C̷̛̜̏̾̔ľ̶̖̙̎̐ē̸̟̯̆̉é̵̳̺̒̚ẗ̴̫́̽̿̂ư̷̜̏̾̔š̶̖̙̎̐", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Cleetus/refs/heads/main/Cleetus")
+addMorphButton("Ḡ̸̟̯̆̉é̵̳̺̒̚n̴̫̈́̽̿̂k̷̛̜̏̾̔ǎ̶̖̙̎̐ā̸̟̯̆̉d̵̳̺́̒̚ä̴̫́̽̿̂ Ơ̷̜̏̾̔m̶̖̙̌̎̐ē̸̟̯̆̉ǵ̵̳̺̒̚ä̴̫́̽̿̂ S̷̛̜̏̾̔w̶̖̙̌̎̐ō̸̟̯̆̉ŕ̵̳̺̒̚d̴̫̈́̽̿̂", "https://raw.githubusercontent.com/nicolasbarbosa323/grakkeda/refs/heads/main/Roblox%20Genkadda%20omega%20leaked.txt")
+addMorphButton("D̷̛̜̏̾̔ě̶̖̙̎̐v̸̟̯̄̆̉í̵̳̺̒̚l̴̫̈́̽̿̂ G̷̛̜̏̾̔ľ̶̖̙̎̐ō̸̟̯̆̉v̵̳̺́̒̚ë̴̫́̽̿̂", "https://pastebin.com/raw/GZWtWL0y")
+addMorphButton("C̴̫̈́̽̿̂h̷̛̜̏̾̔ǎ̶̖̙̎̐ō̸̟̯̆̉t̵̳̺́̒̚ḯ̴̫̽̿̂c̷̛̜̏̾̔ Ǧ̶̖̙̎̐ō̸̟̯̆̉d̵̳̺́̒̚", "https://pastebin.com/raw/ygMBF5G6")
+addMorphButton("G̷̛̜̏̾̔ř̶̖̙̎̐ē̸̟̯̆̉é̵̳̺̒̚n̴̫̈́̽̿̂ w̷̛̜̏̾̔ǐ̶̖̙̎̐n̸̟̯̄̆̉ǵ̵̳̺̒̚s̴̫̈́̽̿̂", "https://pastebin.com/raw/X3Y7adwk")
+addMorphButton("B̸̟̯̄̆̉ĺ̵̳̺̒̚ǘ̴̫̽̿̂ȅ̷̛̜̾̔ Š̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚k̴̫̈́̽̿̂l̷̛̜̏̾̔ě̶̖̙̎̐", "https://pastebin.com/raw/Yk5xGGyD")
+addMorphButton("L̸̟̯̄̆̉é̵̳̺̒̚g̴̫̈́̽̿̂ȅ̷̛̜̾̔ň̶̖̙̎̐d̸̟̯̄̆̉á̵̳̺̒̚r̴̫̈́̽̿̂y̷̛̜̏̾̔ Š̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚k̴̫̈́̽̿̂l̷̛̜̏̾̔ě̶̖̙̎̐", "https://pastebin.com/raw/7qNpiSQs")
+addMorphButton("X̶̖̙̌̎̐ s̸̟̯̄̆̉ẃ̵̳̺̒̚ö̴̫́̽̿̂ȑ̷̛̜̾̔ď̶̖̙̎̐", "https://pastebin.com/raw/6dw0wuc1")
+addMorphButton("P̸̟̯̄̆̉ú̵̳̺̒̚r̴̫̈́̽̿̂p̷̛̜̏̾̔ľ̶̖̙̎̐ē̸̟̯̆̉ Ś̵̳̺̒̚ẅ̴̫́̽̿̂ơ̷̜̏̾̔ř̶̖̙̎̐d̸̟̯̄̆̉", "https://pastebin.com/raw/kC0DdRS7")
+addMorphButton("Ơ̷̜̏̾̔m̶̖̙̌̎̐n̸̟̯̄̆̉í̵̳̺̒̚ G̴̫̈́̽̿̂ơ̷̜̏̾̔ď̶̖̙̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God")
+addMorphButton("Ź̵̳̺̒̚ë̴̫́̽̿̂n̷̛̜̏̾̔ǎ̶̖̙̎̐t̸̟̯̄̆̉í̵̳̺̒̚c̴̫̈́̽̿̂", "https://pastebin.com/raw/8WiaahB7")
+addMorphButton("Ȉ̷̛̜̾̔ř̶̖̙̎̐ō̸̟̯̆̉ń̵̳̺̒̚ ḧ̴̫́̽̿̂ȁ̷̛̜̾̔ň̶̖̙̎̐d̸̟̯̄̆̉", "https://pastebin.com/raw/0HKHHPJV")
+addMorphButton("Á̵̳̺̒̚l̴̫̈́̽̿̂l̷̛̜̏̾̔ Š̶̖̙̎̐ē̸̟̯̆̉é̵̳̺̒̚ḯ̴̫̽̿̂n̷̛̜̏̾̔ǧ̶̖̙̎̐ H̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂d̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand")
+addMorphButton("Ǒ̶̖̙̎̐c̸̟̯̄̆̉ú̵̳̺̒̚l̴̫̈́̽̿̂ư̷̜̏̾̔š̶̖̙̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Oculus")
+addMorphButton("D̸̟̯̄̆̉é̵̳̺̒̚ẗ̴̫́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐m̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂ȁ̷̛̜̾̔ť̶̖̙̎̐ī̸̟̯̆̉ó̵̳̺̒̚n̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Determination")
+addMorphButton("H̷̛̜̏̾̔ǎ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ X̶̖̙̌̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Hacker%20X")
+addMorphButton("Ŕ̵̳̺̒̚ä̴̫́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐b̸̟̯̄̆̉ó̵̳̺̒̚ẅ̴̫́̽̿̂ G̷̛̜̏̾̔ľ̶̖̙̎̐ō̸̟̯̆̉ẃ̵̳̺̒̚ë̴̫́̽̿̂", "https://pastebin.com/raw/G9y0Nu2h")
+addMorphButton("B̴̫̈́̽̿̂ȁ̷̛̜̾̔ň̶̖̙̎̐ī̸̟̯̆̉ś̵̳̺̒̚ḧ̴̫́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://pastebin.com/raw/nHN5eMQx")
+addMorphButton("W̶̖̙̌̎̐h̸̟̯̄̆̉í̵̳̺̒̚ẗ̴̫́̽̿̂ȅ̷̛̜̾̔ š̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚k̴̫̈́̽̿̂l̷̛̜̏̾̔ě̶̖̙̎̐", "https://pastebin.com/raw/xHaWXEqA")
+addMorphButton("R̸̟̯̄̆̉á̵̳̺̒̚ḯ̴̫̽̿̂n̷̛̜̏̾̔b̶̖̙̌̎̐ō̸̟̯̆̉ẃ̵̳̺̒̚ K̴̫̈́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ḡ̸̟̯̆̉", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher")
+addMorphButton("S̴̫̈́̽̿̂p̷̛̜̏̾̔ě̶̖̙̎̐c̸̟̯̄̆̉t̵̳̺́̒̚r̴̫̈́̽̿̂ư̷̜̏̾̔m̶̖̙̌̎̐ Ḡ̸̟̯̆̉ĺ̵̳̺̒̚ḯ̴̫̽̿̂t̷̛̜̏̾̔č̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/sr")
+addMorphButton("J̷̛̜̏̾̔ǒ̶̖̙̎̐h̸̟̯̄̆̉ń̵̳̺̒̚ d̴̫̈́̽̿̂ơ̷̜̏̾̔ě̶̖̙̎̐", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/John-doe/refs/heads/main/John%20doe")
+addMorphButton("M̸̟̯̄̆̉ŕ̵̳̺̒̚ b̴̫̈́̽̿̂y̷̛̜̏̾̔ě̶̖̙̎̐ b̸̟̯̄̆̉ý̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Mr-bye-bye/refs/heads/main/Mr%20bye%20bye")
+addMorphButton("H̷̛̜̏̾̔ǎ̶̖̙̎̐l̸̟̯̄̆̉ĺ̵̳̺̒̚ö̴̫́̽̿̂w̷̛̜̏̾̔ Š̶̖̙̎̐l̸̟̯̄̆̉á̵̳̺̒̚ÿ̴̫́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/HSlayer")
+addMorphButton("L̸̟̯̄̆̉ú̵̳̺̒̚n̴̫̈́̽̿̂ȁ̷̛̜̾̔ť̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/lunatic")
+addMorphButton("Ř̶̖̙̎̐ē̸̟̯̆̉f̵̳̺́̒̚ǘ̴̫̽̿̂l̷̛̜̏̾̔ǧ̶̖̙̎̐ē̸̟̯̆̉ń̵̳̺̒̚c̴̫̈́̽̿̂ȅ̷̛̜̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/light")
+addMorphButton("S̷̛̜̏̾̔ǔ̶̖̙̎̐k̸̟̯̄̆̉ú̵̳̺̒̚n̴̫̈́̽̿̂ȁ̷̛̜̾̔", "https://pastebin.com/raw/iW2Gg6Hh")
+addMorphButton("Ǔ̶̖̙̎̐l̸̟̯̄̆̉t̵̳̺́̒̚ḯ̴̫̽̿̂m̷̛̜̏̾̔ǎ̶̖̙̎̐t̸̟̯̄̆̉é̵̳̺̒̚ D̴̫̈́̽̿̂ơ̷̜̏̾̔m̶̖̙̌̎̐ī̸̟̯̆̉ń̵̳̺̒̚ǘ̴̫̽̿̂s̷̛̜̏̾̔", "https://pastebin.com/raw/gBFyvYzQ")
+addMorphButton("M̸̟̯̄̆̉ŕ̵̳̺̒̚.p̴̫̈́̽̿̂ȉ̷̛̜̾̔x̶̖̙̌̎̐ē̸̟̯̆̉ĺ̵̳̺̒̚s̴̫̈́̽̿̂", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Mr.Pixels.lua")
+addMorphButton("P̷̛̜̏̾̔ǔ̶̖̙̎̐r̸̟̯̄̆̉ṕ̵̳̺̒̚l̴̫̈́̽̿̂ȅ̷̛̜̾̔ Ȟ̶̖̙̎̐ā̸̟̯̆̉ń̵̳̺̒̚d̴̫̈́̽̿̂", "https://pastebin.com/raw/cF3S1FVV")
+addMorphButton("L̷̛̜̏̾̔ǒ̶̖̙̎̐v̸̟̯̄̆̉é̵̳̺̒̚ G̴̫̈́̽̿̂l̷̛̜̏̾̔ǒ̶̖̙̎̐w̸̟̯̄̆̉é̵̳̺̒̚", "https://pastebin.com/raw/AaNuC7H8")
+addMorphButton("P̶̖̙̌̎̐ū̸̟̯̆̉ḿ̵̳̺̒̚p̴̫̈́̽̿̂k̷̛̜̏̾̔ǐ̶̖̙̎̐n̸̟̯̄̆̉ Ó̵̳̺̒̚v̴̫̈́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐s̸̟̯̄̆̉é̵̳̺̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔", "https://pastebin.com/raw/sX25byLe")
+addMorphButton("Ḱ̵̳̺̒̚ḯ̴̫̽̿̂t̷̛̜̏̾̔č̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚n̴̫̈́̽̿̂ g̷̛̜̏̾̔ǔ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/nicolasbarbosa323/rare/refs/heads/main/kitcher%20gun.lua")
+addMorphButton("R̴̫̈́̽̿̂ȅ̷̛̜̾̔ď̶̖̙̎̐ S̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂ d̷̛̜̏̾̔ř̶̖̙̎̐ā̸̟̯̆̉ǵ̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔", "https://raw.githubusercontent.com/nicolasbarbosa323/sin-dragon/refs/heads/main/Fe_sin_dragon_music_customizado_final.lua")
+addMorphButton("G̷̛̜̏̾̔ǎ̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ ȟ̶̖̙̎̐ā̸̟̯̆̉ń̵̳̺̒̚d̴̫̈́̽̿̂s̷̛̜̏̾̔", "https://raw.githubusercontent.com/nicolasbarbosa323/good-cop-bad-coop/refs/heads/main/GasterHands.txt")
+addMorphButton("Ǧ̶̖̙̎̐ā̸̟̯̆̉ĺ̵̳̺̒̚ä̴̫́̽̿̂x̷̛̜̏̾̔y̶̖̙̌̎̐ b̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂ȉ̷̛̜̾̔š̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂ g̷̛̜̏̾̔ǔ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Galaxy-banisher-gun/refs/heads/main/Galaxy%20banisher")
+addMorphButton("J̸̟̯̄̆̉ó̵̳̺̒̚ḧ̴̫́̽̿̂n̷̛̜̏̾̔ Ď̶̖̙̎̐ō̸̟̯̆̉é̵̳̺̒̚ (̴̫̈́̽̿̂Ȑ̷̛̜̾̔ě̶̖̙̎̐m̸̟̯̄̆̉á̵̳̺̒̚k̴̫̈́̽̿̂ȅ̷̛̜̾̔)̶̖̙̌̎̐", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
+addMorphButton("X̷̛̜̏̾̔ě̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ (̶̖̙̌̎̐R̸̟̯̄̆̉é̵̳̺̒̚m̴̫̈́̽̿̂ȁ̷̛̜̾̔ǩ̶̖̙̎̐ē̸̟̯̆̉)̵̳̺́̒̚", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
 
 local hacklordBtn = Instance.new("TextButton", morphsScroll)
 hacklordBtn.Size = UDim2.new(1,0,1,0)
-hacklordBtn.Text = "Hacklord"
+hacklordBtn.Text = "H̷̛̜̏̾̔ǎ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚l̴̫̈́̽̿̂ơ̷̜̏̾̔ř̶̖̙̎̐d̸̟̯̄̆̉"
 hacklordBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 hacklordBtn.TextColor3 = Color3.fromRGB(230,230,230)
 hacklordBtn.Font = Enum.Font.Gotham
@@ -300,7 +295,7 @@ miscContainer.ClipsDescendants = true
 local miscLabel = Instance.new("TextLabel", miscContainer)
 miscLabel.Size = UDim2.new(1,0,0,30)
 miscLabel.BackgroundTransparency = 1
-miscLabel.Text = "Misc"
+miscLabel.Text = "M̶̖̙̌̎̐ī̸̟̯̆̉ś̵̳̺̒̚c̴̫̈́̽̿̂"
 miscLabel.TextColor3 = Color3.fromRGB(255,255,255)
 miscLabel.Font = Enum.Font.GothamBold
 miscLabel.TextSize = 16
@@ -333,8 +328,8 @@ local function addMiscButton(name, url)
 	end)
 end
 
-addMiscButton("Keyboard", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
-addMiscButton("R6", "https://raw.githubusercontent.com/LeathalMurd/Roblox-R15-To-R6/refs/heads/main/Converter.lua")
+addMiscButton("K̷̛̜̏̾̔ě̶̖̙̎̐ȳ̸̟̯̆̉b̵̳̺́̒̚ö̴̫́̽̿̂ȁ̷̛̜̾̔ř̶̖̙̎̐d̸̟̯̄̆̉", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
+addMiscButton("Ŕ̵̳̺̒̚6̴̫̈́̽̿̂", "https://raw.githubusercontent.com/LeathalMurd/Roblox-R15-To-R6/refs/heads/main/Converter.lua")
 
 local guiContainer = Instance.new("Frame", guiPage)
 guiContainer.Size = UDim2.new(1,-20,1,-20)
@@ -345,7 +340,7 @@ guiContainer.ClipsDescendants = true
 local guiLabel = Instance.new("TextLabel", guiContainer)
 guiLabel.Size = UDim2.new(1,0,0,30)
 guiLabel.BackgroundTransparency = 1
-guiLabel.Text = "GUI"
+guiLabel.Text = "G̷̛̜̏̾̔Ǔ̶̖̙̎̐Ī̸̟̯̆̉"
 guiLabel.TextColor3 = Color3.fromRGB(255,255,255)
 guiLabel.Font = Enum.Font.GothamBold
 guiLabel.TextSize = 16
@@ -378,8 +373,8 @@ local function addGuiButton(name, url)
 	end)
 end
 
-addGuiButton("Fly GUI", "https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui")
-addGuiButton("NPS Spawner", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
+addGuiButton("F̷̛̜̏̾̔ľ̶̖̙̎̐ȳ̸̟̯̆̉ Ǵ̵̳̺̒̚Ǘ̴̫̽̿̂Ȉ̷̛̜̾̔", "https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui")
+addGuiButton("N̸̟̯̄̆̉Ṕ̵̳̺̒̚S̴̫̈́̽̿̂ S̷̛̜̏̾̔p̶̖̙̌̎̐ā̸̟̯̆̉ẃ̵̳̺̒̚n̴̫̈́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
 
 local function tweenColor(object, color1, color2, duration)
 	while true do
