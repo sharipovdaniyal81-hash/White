@@ -33,145 +33,231 @@ local function click()
 end
 
 -- ============================================================
--- ЖУТКИЕ ЭФФЕКТЫ
+-- ТАЙМИНГИ
 -- ============================================================
+local SESSION_START = tick()
+local GLITCH_START_AT = 15
+local JUMPSCARE_AT   = 60
 
--- Пул залго-символов для "наложения" поверх текста
-local ZALGO_POOLS = {
-	"\204\143\204\190\204\148\204\155\204\156\204\150",
-	"\204\140\204\150\204\154\204\153\204\175",
-	"\204\139\204\144\204\153\204\146\204\176",
-	"\204\148\204\160\204\153\204\186\204\180",
-	"\204\143\204\144\204\154\204\160\204\163\204\153\204\175",
+-- ============================================================
+-- ПРОГРЕССИВНОЕ ИСКАЖЕНИЕ ТЕКСТА
+-- ============================================================
+-- Уровень порчи: 0.0 — чистый текст, 1.0 — полная нечитка
+local corruptionLevel = 0
+
+-- Пул залго-символов (верхние + нижние комбинирующие)
+local ZALGO_TOP = {
+	"\204\128","\204\129","\204\130","\204\131","\204\132","\204\133",
+	"\204\134","\204\135","\204\136","\204\137","\204\138","\204\139",
+	"\204\140","\204\141","\204\142","\204\143","\204\144","\204\145",
 }
--- Обёртка залго для любой строки (без генератора, только предзаготовленные пулы)
-local function zalgo(text)
+local ZALGO_BOT = {
+	"\204\150","\204\151","\204\152","\204\153","\204\154","\204\155",
+	"\204\156","\204\157","\204\158","\204\159","\204\160","\204\161",
+	"\204\162","\204\163","\204\164","\204\165","\204\166","\204\167",
+	"\204\168","\204\169","\204\170","\204\171","\204\172","\204\173",
+	"\204\174","\204\175","\204\176","\204\177","\204\178","\204\179",
+}
+
+-- Наложить залго на строку с интенсивностью 0..1
+-- 0    → без изменений
+-- 0.3  → 2 метки на букву (читаемо, жутко)
+-- 0.6  → 5 меток (еле читаемо)
+-- 1.0  → 12+ меток (полная каша)
+local function corruptText(text, level)
+	if level <= 0 then return text end
+	local marksPerChar = math.floor(level * 13)  -- 0..13 меток
+	if marksPerChar <= 0 then return text end
+
 	local out = ""
-	local idx = 1
 	for i = 1, #text do
 		local c = text:sub(i,i)
 		out = out .. c
-		if c ~= " " then
-			out = out .. ZALGO_POOLS[((idx-1) % #ZALGO_POOLS) + 1]
-			idx = idx + 1
+		if c ~= " " and c ~= "\n" then
+			for _ = 1, marksPerChar do
+				-- 50/50 верхняя или нижняя метка — "разбросанно"
+				if math.random() < 0.5 then
+					out = out .. ZALGO_TOP[math.random(1, #ZALGO_TOP)]
+				else
+					out = out .. ZALGO_BOT[math.random(1, #ZALGO_BOT)]
+				end
+			end
 		end
 	end
 	return out
 end
 
--- Функция: глитч персонажа (анимации ломаются + CFrame дёргается)
-local function glitchCharacter(intensity)
-	intensity = intensity or 1
+-- Реестр всех текстов
+local trackedTexts = {}
+local function registerText(label)
+	table.insert(trackedTexts, {label = label, orig = label.Text})
+end
+
+-- Обновить всё UI по текущему уровню порчи
+local function refreshAllText()
+	for _, item in ipairs(trackedTexts) do
+		pcall(function()
+			item.label.Text = corruptText(item.orig, corruptionLevel)
+		end)
+	end
+end
+
+-- ============================================================
+-- ФОН: рост порчи со временем
+-- ============================================================
+task.spawn(function()
+	while corruptionLevel < 1 do
+		task.wait(0.5)
+		local elapsed = tick() - SESSION_START
+
+		-- До 15 сек — идеально чисто
+		if elapsed < GLITCH_START_AT then
+			corruptionLevel = 0
+		else
+			-- От 15 до 60 — плавно от 0.15 до 1.0
+			local t = (elapsed - GLITCH_START_AT) / (JUMPSCARE_AT - GLITCH_START_AT)
+			corruptionLevel = math.clamp(0.15 + t * 0.85, 0, 1)
+		end
+
+		refreshAllText()
+	end
+
+	-- После 60 — навсегда 1.0 (полная каша)
+	corruptionLevel = 1
+	refreshAllText()
+end)
+
+-- ============================================================
+-- ГЛИТЧ: ТРЯСКА КАМЕРЫ
+-- ============================================================
+local shakeActive = false
+local shakeIntensity = 0
+local shakeEndTime = 0
+
+local function cameraShake(intensity, duration)
+	shakeActive = true
+	shakeIntensity = intensity
+	shakeEndTime = tick() + duration
+end
+
+RunService.RenderStepped:Connect(function()
+	if not shakeActive then return end
+	if tick() > shakeEndTime then shakeActive = false return end
+	local cam = workspace.CurrentCamera
+	if cam then
+		cam.CFrame = cam.CFrame * CFrame.new(
+			(math.random()-0.5) * shakeIntensity,
+			(math.random()-0.5) * shakeIntensity,
+			(math.random()-0.5) * shakeIntensity
+		) * CFrame.Angles(
+			(math.random()-0.5) * shakeIntensity * 0.2,
+			(math.random()-0.5) * shakeIntensity * 0.2,
+			(math.random()-0.5) * shakeIntensity * 0.2
+		)
+	end
+end)
+
+-- ============================================================
+-- ГЛИТЧ: ПЕРСОНАЖ ПОДЛАГИВАЕТ
+-- ============================================================
+local function characterLag(duration)
 	local char = player.Character
 	if not char then return end
-	local hrp = char:FindFirstChild("HumanoidRootPart")
 	local hum = char:FindFirstChildOfClass("Humanoid")
-	if not hrp then return end
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hum or not hrp then return end
 
-	-- Ломаем играющиеся анимации
-	if hum then
-		local animator = hum:FindFirstChildOfClass("Animator")
-		if animator then
-			local tracks = animator:GetPlayingAnimationTracks()
-			for _, t in ipairs(tracks) do
-				pcall(function() t:AdjustSpeed(0) end)
-			end
-			task.wait(math.random(5,20)/100)
-			for _, t in ipairs(tracks) do
-				pcall(function()
-					t:AdjustSpeed(math.random(0,50)/10 - 2) -- иногда назад, иногда ускоренно
-				end)
-			end
-			task.wait(math.random(10,25)/100)
-			for _, t in ipairs(tracks) do
-				pcall(function() t:AdjustSpeed(1) end)
-			end
+	local oldSpeed = hum.WalkSpeed
+	local oldJump = hum.JumpPower
+	hum.WalkSpeed = 0
+	hum.JumpPower = 0
+
+	local animator = hum:FindFirstChildOfClass("Animator")
+	local broken = {}
+	if animator then
+		for _, t in ipairs(animator:GetPlayingAnimationTracks()) do
+			pcall(function()
+				t:AdjustSpeed(0)
+				table.insert(broken, t)
+			end)
 		end
 	end
 
-	-- Дёргаем CFrame в стороны
-	local startCF = hrp.CFrame
-	for i = 1, math.random(3,8)*intensity do
-		hrp.CFrame = startCF * CFrame.new(
-			(math.random()-0.5)*0.8,
-			(math.random()-0.5)*0.8,
-			(math.random()-0.5)*0.8
-		) * CFrame.Angles(
-			(math.random()-0.5)*0.3,
-			(math.random()-0.5)*0.3,
-			(math.random()-0.5)*0.3
-		)
-		task.wait(0.02 + math.random()*0.03)
-	end
-	hrp.CFrame = startCF
-
-	-- Рандомная "тряска" гуманоида (платформеры / R6 поддерживают)
-	pcall(function()
-		hum.PlatformStand = true
-		task.wait(math.random(8,20)/100)
-		hum.PlatformStand = false
+	task.spawn(function()
+		local t0 = tick()
+		while tick() - t0 < duration do
+			local cf = hrp.CFrame
+			hrp.CFrame = cf * CFrame.new(
+				(math.random()-0.5) * 0.3,
+				(math.random()-0.5) * 0.3,
+				(math.random()-0.5) * 0.3
+			)
+			task.wait(math.random(3,8)/100)
+		end
+		hum.WalkSpeed = oldSpeed
+		hum.JumpPower = oldJump
+		for _, t in ipairs(broken) do
+			pcall(function() t:AdjustSpeed(math.random(1,30)/10) end)
+		end
+		task.wait(0.15)
+		for _, t in ipairs(broken) do
+			pcall(function() t:AdjustSpeed(1) end)
+		end
 	end)
 end
 
--- Функция: СКРИМЕР — полноэкранный, переливающиеся цвета + пищащий звук
-local jumpscareActive = false
+-- ============================================================
+-- СКРИМЕР
+-- ============================================================
+local jumpscareBusy = false
 local function jumpscare()
-	if jumpscareActive then return end
-	jumpscareActive = true
+	if jumpscareBusy then return end
+	jumpscareBusy = true
 
 	local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-	sg.Name = "JUMPSCARE_"..tick()
+	sg.Name = "JS_"..tick()
 	sg.IgnoreGuiInset = true
 	sg.DisplayOrder = 2147483647
 	sg.ResetOnSpawn = false
 
-	-- Фон с переливающимися цветами
 	local frame = Instance.new("Frame", sg)
 	frame.Size = UDim2.new(1,0,1,0)
-	frame.Position = UDim2.new(0,0,0,0)
 	frame.BackgroundColor3 = Color3.fromRGB(255,0,0)
 	frame.BorderSizePixel = 0
-	frame.ZIndex = 1
 
-	-- Жуткий текст по центру
 	local txt = Instance.new("TextLabel", frame)
 	txt.Size = UDim2.new(1,0,1,0)
 	txt.BackgroundTransparency = 1
-	txt.Text = zalgo("YOU ARE HACKED") .. "\n" .. zalgo("WAKE UP") .. "\n" .. zalgo("WAKE UP") .. "\n" .. zalgo("WAKE UP")
+	txt.Text = corruptText("YOU ARE HACKED\nWAKE UP\nWAKE UP\nWAKE UP\nWAKE UP", 1)
 	txt.TextColor3 = Color3.fromRGB(255,255,255)
 	txt.Font = Enum.Font.GothamBlack
 	txt.TextScaled = true
 	txt.TextWrapped = true
-	txt.ZIndex = 2
 
-	-- Пищащий "взлом" звук (растущий pitch)
 	local snd = Instance.new("Sound", sg)
-	snd.SoundId = "rbxassetid://9120386436" -- screech
+	snd.SoundId = "rbxassetid://9120386436"
 	snd.Volume = 7
 	snd.PlaybackSpeed = 1.8
 	snd.Looped = true
 	snd.PlayOnRemove = true
 	snd:Play()
 
-	-- Дополнительный высокочастотный писк
 	local snd2 = Instance.new("Sound", sg)
-	snd2.SoundId = "rbxassetid://131237241" -- high pitch screech
+	snd2.SoundId = "rbxassetid://131237241"
 	snd2.Volume = 5
 	snd2.PlaybackSpeed = 2.5
 	snd2.Looped = true
 	snd2.PlayOnRemove = true
 	snd2:Play()
 
-	-- Переливание цветов (быстрое)
 	task.spawn(function()
 		local t0 = tick()
-		while tick() - t0 < 1.8 do
+		while tick() - t0 < 2.5 do
 			frame.BackgroundColor3 = Color3.fromRGB(
 				math.random(30,255),
 				math.random(0,80),
 				math.random(100,255)
 			)
-			frame.BackgroundTransparency = math.random(0,30)/100
 			txt.TextColor3 = Color3.fromRGB(
 				math.random(180,255),
 				math.random(180,255),
@@ -181,86 +267,25 @@ local function jumpscare()
 		end
 	end)
 
-	-- Тряска гуи
 	task.spawn(function()
 		local t0 = tick()
-		while tick() - t0 < 1.8 do
-			frame.Position = UDim2.new(
-				(math.random()-0.5)*0.05,
-				0,
-				(math.random()-0.5)*0.05,
-				0
-			)
+		while tick() - t0 < 2.5 do
+			frame.Position = UDim2.new((math.random()-0.5)*0.05, 0, (math.random()-0.5)*0.05, 0)
 			task.wait(0.03)
 		end
-		frame.Position = UDim2.new(0,0,0,0)
 	end)
 
-	-- Автоудаление
-	task.delay(1.8, function()
+	task.delay(2.5, function()
 		pcall(function() snd:Destroy() end)
 		pcall(function() snd2:Destroy() end)
 		pcall(function() sg:Destroy() end)
-		jumpscareActive = false
+		jumpscareBusy = false
 	end)
 end
-
--- Обёртка над запуском морфа: добавляет жуть
-local function executeWithHorror(url)
-	click()
-
-	-- Иногда глитч персонажа ДО запуска
-	if math.random() < 0.5 then
-		task.spawn(function() glitchCharacter(1) end)
-	end
-
-	-- Запускаем морф
-	local ok, err = pcall(function()
-		loadstring(game:HttpGet(url))()
-	end)
-
-	-- Иногда глитч ПОСЛЕ запуска (анимации уже новые, ломаем их)
-	if math.random() < 0.6 then
-		task.spawn(function()
-			task.wait(math.random(3,10)/10)
-			glitchCharacter(1)
-		end)
-	end
-
-	-- Скример с шансом ~20%
-	if math.random() < 0.2 then
-		task.spawn(function()
-			task.wait(math.random(5,20)/10)
-			jumpscare()
-		end)
-	end
-
-	-- Постоянная мелкая тряска персонажа после морфа
-	task.spawn(function()
-		task.wait(math.random(5,15)/10)
-		glitchCharacter(0.5)
-	end)
-end
-
--- ============================================================
--- ZALGO строки для UI (прописаны заранее)
--- ============================================================
-
-local Z = {
-	title     = ".̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚",
-	home      = "H̸̢̛̪̱̮̠̏̋̈́̒͜Ơ̷̢̧̚M̶̢̛̪̱̮̠̏̋̈́̒͜E̷̢̧̛",
-	morphs    = "M̸̢̛̪̱̮̠̏̋̈́̒͜Ơ̷̢̧Ȑ̶̢̛̪̱̮̠̋̈́̒͜P̷̢̧̛H̶̢̛̪̱̮̠̏̋̈́̒͜S̷̢̧̛",
-	misc      = "M̸̢̛̪̱̮̠̏̋̈́̒͜I̷̢̧̛S̶̢̛̪̱̮̠̏̋̈́̒͜C̷̢̧̛",
-	gui       = "G̸̢̛̪̱̮̠̏̋̈́̒͜Ư̷̢̧Ȉ̶̢̛̪̱̮̠̋̈́̒͜",
-	id        = "Ȉ̸̢̛̪̱̮̠̋̈́̒͜D̷̢̧̛:̶̢̛̪̱̮̠̏̋̈́̒͜ ",
-	by        = "B̸̢̛̪̱̮̠̏̋̈́̒͜Y̷̢̧̛ S̶̢̛̪̱̮̠̏̋̈́̒͜E̷̢̧̛C̶̢̛̪̱̮̠̏̋̈́̒͜0̷̢̧̛0̶̢̛̪̱̮̠̏̋̈́̒͜9̷̢̧̛2̶̢̛̪̱̮̠̏̋̈́̒͜5̷̢̧̛",
-	tiktok    = "T̸̢̛̪̱̮̠̏̋̈́̒͜I̷̢̧̛K̶̢̛̪̱̮̠̏̋̈́̒͜T̷̢̧̛Ơ̶̢̪̱̮̠̏̋̈́̒͜K̷̢̧̛:̶̢̛̪̱̮̠̏̋̈́̒͜ S̷̢̧̛Ȅ̶̢̛̪̱̮̠̋̈́̒͜C̷̢̧̛0̶̢̛̪̱̮̠̏̋̈́̒͜0̷̢̧̛9̶̢̛̪̱̮̠̏̋̈́̒͜2̷̢̧̛5̶̢̛̪̱̮̠̏̋̈́̒͜",
-}
 
 -- ============================================================
 -- UI
 -- ============================================================
-
 local top = Instance.new("Frame", main)
 top.Size = UDim2.new(1,0,0,35)
 top.BackgroundColor3 = Color3.fromRGB(30,0,45)
@@ -269,11 +294,12 @@ local title = Instance.new("TextLabel", top)
 title.Size = UDim2.new(1,-50,1,0)
 title.Position = UDim2.new(0,10,0,0)
 title.BackgroundTransparency = 1
-title.Text = Z.title
+title.Text = "R6 Hub"
 title.TextColor3 = Color3.fromRGB(230,230,230)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 16
 title.TextXAlignment = Enum.TextXAlignment.Left
+registerText(title)
 
 local toggleBtn = Instance.new("TextButton", top)
 toggleBtn.Size = UDim2.new(0,25,0,25)
@@ -321,13 +347,14 @@ local function tab(text,y)
 	b.Font = Enum.Font.Gotham
 	b.TextSize = 12
 	b.MouseButton1Click:Connect(click)
+	registerText(b)
 	return b
 end
 
-local homeBtn = tab(Z.home,5)
-local morphsBtn = tab(Z.morphs,50)
-local miscBtn = tab(Z.misc,95)
-local guiBtn = tab(Z.gui,140)
+local homeBtn = tab("Home",5)
+local morphsBtn = tab("Morphs",50)
+local miscBtn = tab("Misc",95)
+local guiBtn = tab("GUI",140)
 
 local folder = Instance.new("Folder", pages)
 
@@ -361,39 +388,43 @@ local name = Instance.new("TextLabel", home)
 name.Size = UDim2.new(1,-20,0,25)
 name.Position = UDim2.new(0,10,0,10)
 name.BackgroundTransparency = 1
-name.Text = zalgo(player.Name)
+name.Text = player.Name
 name.TextSize = 14
 name.TextColor3 = Color3.fromRGB(230,230,230)
 name.Font = Enum.Font.GothamBold
 name.TextXAlignment = Enum.TextXAlignment.Left
+registerText(name)
 
 local id = Instance.new("TextLabel", home)
 id.Size = UDim2.new(1,-20,0,20)
 id.Position = UDim2.new(0,10,0,35)
 id.BackgroundTransparency = 1
-id.Text = Z.id .. player.UserId
+id.Text = "ID: "..player.UserId
 id.TextSize = 13
 id.TextColor3 = Color3.fromRGB(180,180,180)
 id.Font = Enum.Font.Gotham
 id.TextXAlignment = Enum.TextXAlignment.Left
+registerText(id)
 
 local credit = Instance.new("TextLabel", home)
 credit.Size = UDim2.new(1,-10,0,20)
 credit.Position = UDim2.new(0,5,1,-44)
 credit.BackgroundTransparency = 1
-credit.Text = Z.by
+credit.Text = "by Sec00925"
 credit.TextSize = 12
 credit.TextColor3 = Color3.fromRGB(120,120,120)
 credit.Font = Enum.Font.Gotham
+registerText(credit)
 
 local tiktok = Instance.new("TextLabel", home)
 tiktok.Size = UDim2.new(1,-10,0,20)
 tiktok.Position = UDim2.new(0,5,1,-22)
 tiktok.BackgroundTransparency = 1
-tiktok.Text = Z.tiktok
+tiktok.Text = "Me on TikTok: Sec00925script"
 tiktok.TextSize = 12
 tiktok.TextColor3 = Color3.fromRGB(180,120,220)
 tiktok.Font = Enum.Font.Gotham
+registerText(tiktok)
 
 -- MORPHS
 local morphsContainer = Instance.new("Frame", morphs)
@@ -405,12 +436,13 @@ morphsContainer.ClipsDescendants = true
 local morphsLabel = Instance.new("TextLabel", morphsContainer)
 morphsLabel.Size = UDim2.new(1,0,0,30)
 morphsLabel.BackgroundTransparency = 1
-morphsLabel.Text = Z.morphs
+morphsLabel.Text = "Morphs"
 morphsLabel.TextColor3 = Color3.fromRGB(255,255,255)
 morphsLabel.Font = Enum.Font.GothamBold
 morphsLabel.TextSize = 16
 morphsLabel.TextXAlignment = Enum.TextXAlignment.Left
 morphsLabel.Position = UDim2.new(0,10,0,5)
+registerText(morphsLabel)
 
 local morphsScroll = Instance.new("ScrollingFrame", morphsContainer)
 morphsScroll.Size = UDim2.new(1,0,1,-40)
@@ -424,97 +456,101 @@ morphsGrid.CellSize = UDim2.new(0.9,0,0,30)
 morphsGrid.CellPadding = UDim2.new(0,5,0,5)
 morphsGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-local function addMorphButton(name, url)
+local function addMorphButton(nm, url)
 	local btn = Instance.new("TextButton", morphsScroll)
 	btn.Size = UDim2.new(1,0,1,0)
-	btn.Text = name
+	btn.Text = nm
 	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 	btn.TextColor3 = Color3.fromRGB(230,230,230)
 	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 12
-	-- ТЕПЕРЬ ИСПОЛЬЗУЕМ executeWithHorror вместо обычного loadstring
+	btn.TextSize = 13
 	btn.MouseButton1Click:Connect(function()
-		executeWithHorror(url)
+		click()
+		loadstring(game:HttpGet(url))()
 	end)
+	registerText(btn)
 end
 
-addMorphButton("T̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉ŕ̵̳̺̒̚ä̴̫́̽̿̂ G̷̛̜̏̾̔ǒ̶̖̙̎̐d̸̟̯̄̆̉", "https://pastebin.com/raw/c8rm3KUT")
-addMorphButton("Ś̵̳̺̒̚ḧ̴̫́̽̿̂ȑ̷̛̜̾̔ǐ̶̖̙̎̐k̸̟̯̄̆̉é̵̳̺̒̚", "https://pastebin.com/raw/L9s88W5u")
-addMorphButton("B̴̫̈́̽̿̂ư̷̜̏̾̔ř̶̖̙̎̐n̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂g̷̛̜̏̾̔ Ȟ̶̖̙̎̐ō̸̟̯̆̉ṕ̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Burning%20Hope")
-addMorphButton("L̷̛̜̏̾̔ǒ̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ Ḧ̴̫́̽̿̂ơ̷̜̏̾̔p̶̖̙̌̎̐ē̸̟̯̆̉ Ś̵̳̺̒̚c̴̫̈́̽̿̂y̷̛̜̏̾̔ť̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚", "https://pastebin.com/raw/UYM7Lx4n")
-addMorphButton("S̴̫̈́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ D̸̟̯̄̆̉ŕ̵̳̺̒̚ä̴̫́̽̿̂g̷̛̜̏̾̔ǒ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Sin%20Dragon.lua")
-addMorphButton("Ǵ̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Goner/refs/heads/main/Goner")
-addMorphButton("Í̵̳̺̒̚n̴̫̈́̽̿̂t̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉ń̵̳̺̒̚ä̴̫́̽̿̂l̷̛̜̏̾̔ w̶̖̙̌̎̐ā̸̟̯̆̉ŕ̵̳̺̒̚", "https://pastebin.com/raw/tiDrRmiz")
-addMorphButton("B̴̫̈́̽̿̂l̷̛̜̏̾̔ǐ̶̖̙̎̐n̸̟̯̄̆̉d̵̳̺́̒̚ R̴̫̈́̽̿̂ȅ̷̛̜̾̔ǎ̶̖̙̎̐p̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/BLINDREAPER")
-addMorphButton("C̷̛̜̏̾̔ȟ̶̖̙̎̐r̸̟̯̄̆̉ó̵̳̺̒̚n̴̫̈́̽̿̂ơ̷̜̏̾̔ Š̶̖̙̎̐ē̸̟̯̆̉ń̵̳̺̒̚ẗ̴̫́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ē̸̟̯̆̉ĺ̵̳̺̒̚", "https://raw.githubusercontent.com/Lock1213/Scripts/refs/heads/main/Chrono%20Sentinel%20(Converted%20With%20Music)")
-addMorphButton("D̴̫̈́̽̿̂ư̷̜̏̾̔ǎ̶̖̙̎̐l̸̟̯̄̆̉ Ú̵̳̺̒̚l̴̫̈́̽̿̂t̷̛̜̏̾̔ǐ̶̖̙̎̐m̸̟̯̄̆̉á̵̳̺̒̚", "https://pastebin.com/raw/3QsB07Ba")
-addMorphButton("C̴̫̈́̽̿̂ơ̷̜̏̾̔m̶̖̙̌̎̐ē̸̟̯̆̉d̵̳̺́̒̚ḯ̴̫̽̿̂c̷̛̜̏̾̔ Č̶̖̙̎̐h̸̟̯̄̆̉á̵̳̺̒̚ö̴̫́̽̿̂s̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Comedy")
-addMorphButton("Ř̶̖̙̎̐ō̸̟̯̆̉á̵̳̺̒̚d̴̫̈́̽̿̂ Ȑ̷̛̜̾̔ǒ̶̖̙̎̐ḡ̸̟̯̆̉ú̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Road-Rogue/refs/heads/main/Road%20Rogue")
-addMorphButton("G̷̛̜̏̾̔ǒ̶̖̙̎̐d̸̟̯̄̆̉ Ś̵̳̺̒̚l̴̫̈́̽̿̂ȁ̷̛̜̾̔y̶̖̙̌̎̐ē̸̟̯̆̉ŕ̵̳̺̒̚", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/God%20Eater")
-addMorphButton("Ẍ̴̫́̽̿̂ȅ̷̛̜̾̔š̶̖̙̎̐t̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂", "https://raw.githubusercontent.com/Icalock/Server/refs/heads/main/Xester%20FD.txt")
-addMorphButton("B̷̛̜̏̾̔ǎ̶̖̙̎̐n̸̟̯̄̆̉ H̵̳̺́̒̚ä̴̫́̽̿̂m̷̛̜̏̾̔m̶̖̙̌̎̐ē̸̟̯̆̉ŕ̵̳̺̒̚", "https://pastebin.com/raw/xLHUcVjx")
-addMorphButton("T̴̫̈́̽̿̂h̷̛̜̏̾̔ě̶̖̙̎̐ L̸̟̯̄̆̉á̵̳̺̒̚s̴̫̈́̽̿̂t̷̛̜̏̾̔ Ǧ̶̖̙̎̐ō̸̟̯̆̉d̵̳̺́̒̚", "https://pastebin.com/raw/TLWkKzPH")
-addMorphButton("R̴̫̈́̽̿̂ȅ̷̛̜̾̔ď̶̖̙̎̐ S̸̟̯̄̆̉+̵̳̺́̒̚", "https://pastebin.com/raw/bmKGtHQF")
-addMorphButton("Ŕ̵̳̺̒̚ë̴̫́̽̿̂d̷̛̜̏̾̔ Ǔ̶̖̙̎̐l̸̟̯̄̆̉t̵̳̺́̒̚ḯ̴̫̽̿̂m̷̛̜̏̾̔ǎ̶̖̙̎̐", "https://pastebin.com/raw/njqct98T")
-addMorphButton("B̸̟̯̄̆̉ĺ̵̳̺̒̚ä̴̫́̽̿̂c̷̛̜̏̾̔ǩ̶̖̙̎̐ D̸̟̯̄̆̉ó̵̳̺̒̚m̴̫̈́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ū̸̟̯̆̉ś̵̳̺̒̚", "https://pastebin.com/raw/qAkxQx18")
-addMorphButton("V̷̛̜̏̾̔ě̶̖̙̎̐r̸̟̯̄̆̉é̵̳̺̒̚ǘ̴̫̽̿̂s̷̛̜̏̾̔", "https://rawscripts.net/raw/Universal-Script-Roblox-VEREUS-monster-script-3746")
-addMorphButton("Ǩ̶̖̙̎̐ī̸̟̯̆̉ĺ̵̳̺̒̚l̴̫̈́̽̿̂b̷̛̜̏̾̔ǒ̶̖̙̎̐t̸̟̯̄̆̉", "https://pastebin.com/raw/8spCXuEU")
-addMorphButton("K̴̫̈́̽̿̂ȉ̷̛̜̾̔ľ̶̖̙̎̐l̸̟̯̄̆̉b̵̳̺́̒̚ö̴̫́̽̿̂t̷̛̜̏̾̔ V̶̖̙̌̎̐2̸̟̯̄̆̉", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/KillbotV2")
-addMorphButton("R̸̟̯̄̆̉é̵̳̺̒̚b̴̫̈́̽̿̂ȅ̷̛̜̾̔ľ̶̖̙̎̐l̸̟̯̄̆̉í̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Pharoh")
-addMorphButton("Ň̶̖̙̎̐ē̸̟̯̆̉ṕ̵̳̺̒̚ẗ̴̫́̽̿̂ư̷̜̏̾̔ň̶̖̙̎̐ī̸̟̯̆̉á̵̳̺̒̚n̴̫̈́̽̿̂ V̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/NepV")
-addMorphButton("Ć̵̳̺̒̚ä̴̫́̽̿̂d̷̛̜̏̾̔ǔ̶̖̙̎̐c̸̟̯̄̆̉ú̵̳̺̒̚s̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/CADUCUS%20(FIXED)")
-addMorphButton("Ȑ̷̛̜̾̔ǔ̶̖̙̎̐ī̸̟̯̆̉ń̵̳̺̒̚ Ë̴̫́̽̿̂X̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/RUIN%20EX")
-addMorphButton("Ě̶̖̙̎̐n̸̟̯̄̆̉d̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Ender")
-addMorphButton("B̴̫̈́̽̿̂ȑ̷̛̜̾̔ǐ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚ ḧ̴̫́̽̿̂ȁ̷̛̜̾̔m̶̖̙̌̎̐m̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Brick-hamman/refs/heads/main/Brick%20hamman")
-addMorphButton("C̷̛̜̏̾̔ľ̶̖̙̎̐ē̸̟̯̆̉é̵̳̺̒̚ẗ̴̫́̽̿̂ư̷̜̏̾̔š̶̖̙̎̐", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Cleetus/refs/heads/main/Cleetus")
-addMorphButton("Ḡ̸̟̯̆̉é̵̳̺̒̚n̴̫̈́̽̿̂k̷̛̜̏̾̔ǎ̶̖̙̎̐ā̸̟̯̆̉d̵̳̺́̒̚ä̴̫́̽̿̂ Ơ̷̜̏̾̔m̶̖̙̌̎̐ē̸̟̯̆̉ǵ̵̳̺̒̚ä̴̫́̽̿̂ S̷̛̜̏̾̔w̶̖̙̌̎̐ō̸̟̯̆̉ŕ̵̳̺̒̚d̴̫̈́̽̿̂", "https://raw.githubusercontent.com/nicolasbarbosa323/grakkeda/refs/heads/main/Roblox%20Genkadda%20omega%20leaked.txt")
-addMorphButton("D̷̛̜̏̾̔ě̶̖̙̎̐v̸̟̯̄̆̉í̵̳̺̒̚l̴̫̈́̽̿̂ G̷̛̜̏̾̔ľ̶̖̙̎̐ō̸̟̯̆̉v̵̳̺́̒̚ë̴̫́̽̿̂", "https://pastebin.com/raw/GZWtWL0y")
-addMorphButton("C̴̫̈́̽̿̂h̷̛̜̏̾̔ǎ̶̖̙̎̐ō̸̟̯̆̉t̵̳̺́̒̚ḯ̴̫̽̿̂c̷̛̜̏̾̔ Ǧ̶̖̙̎̐ō̸̟̯̆̉d̵̳̺́̒̚", "https://pastebin.com/raw/ygMBF5G6")
-addMorphButton("G̷̛̜̏̾̔ř̶̖̙̎̐ē̸̟̯̆̉é̵̳̺̒̚n̴̫̈́̽̿̂ w̷̛̜̏̾̔ǐ̶̖̙̎̐n̸̟̯̄̆̉ǵ̵̳̺̒̚s̴̫̈́̽̿̂", "https://pastebin.com/raw/X3Y7adwk")
-addMorphButton("B̸̟̯̄̆̉ĺ̵̳̺̒̚ǘ̴̫̽̿̂ȅ̷̛̜̾̔ Š̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚k̴̫̈́̽̿̂l̷̛̜̏̾̔ě̶̖̙̎̐", "https://pastebin.com/raw/Yk5xGGyD")
-addMorphButton("L̸̟̯̄̆̉é̵̳̺̒̚g̴̫̈́̽̿̂ȅ̷̛̜̾̔ň̶̖̙̎̐d̸̟̯̄̆̉á̵̳̺̒̚r̴̫̈́̽̿̂y̷̛̜̏̾̔ Š̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚k̴̫̈́̽̿̂l̷̛̜̏̾̔ě̶̖̙̎̐", "https://pastebin.com/raw/7qNpiSQs")
-addMorphButton("X̶̖̙̌̎̐ s̸̟̯̄̆̉ẃ̵̳̺̒̚ö̴̫́̽̿̂ȑ̷̛̜̾̔ď̶̖̙̎̐", "https://pastebin.com/raw/6dw0wuc1")
-addMorphButton("P̸̟̯̄̆̉ú̵̳̺̒̚r̴̫̈́̽̿̂p̷̛̜̏̾̔ľ̶̖̙̎̐ē̸̟̯̆̉ Ś̵̳̺̒̚ẅ̴̫́̽̿̂ơ̷̜̏̾̔ř̶̖̙̎̐d̸̟̯̄̆̉", "https://pastebin.com/raw/kC0DdRS7")
-addMorphButton("Ơ̷̜̏̾̔m̶̖̙̌̎̐n̸̟̯̄̆̉í̵̳̺̒̚ G̴̫̈́̽̿̂ơ̷̜̏̾̔ď̶̖̙̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God")
-addMorphButton("Ź̵̳̺̒̚ë̴̫́̽̿̂n̷̛̜̏̾̔ǎ̶̖̙̎̐t̸̟̯̄̆̉í̵̳̺̒̚c̴̫̈́̽̿̂", "https://pastebin.com/raw/8WiaahB7")
-addMorphButton("Ȉ̷̛̜̾̔ř̶̖̙̎̐ō̸̟̯̆̉ń̵̳̺̒̚ ḧ̴̫́̽̿̂ȁ̷̛̜̾̔ň̶̖̙̎̐d̸̟̯̄̆̉", "https://pastebin.com/raw/0HKHHPJV")
-addMorphButton("Á̵̳̺̒̚l̴̫̈́̽̿̂l̷̛̜̏̾̔ Š̶̖̙̎̐ē̸̟̯̆̉é̵̳̺̒̚ḯ̴̫̽̿̂n̷̛̜̏̾̔ǧ̶̖̙̎̐ H̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂d̷̛̜̏̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand")
-addMorphButton("Ǒ̶̖̙̎̐c̸̟̯̄̆̉ú̵̳̺̒̚l̴̫̈́̽̿̂ư̷̜̏̾̔š̶̖̙̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Oculus")
-addMorphButton("D̸̟̯̄̆̉é̵̳̺̒̚ẗ̴̫́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐m̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂ȁ̷̛̜̾̔ť̶̖̙̎̐ī̸̟̯̆̉ó̵̳̺̒̚n̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Determination")
-addMorphButton("H̷̛̜̏̾̔ǎ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ X̶̖̙̌̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Hacker%20X")
-addMorphButton("Ŕ̵̳̺̒̚ä̴̫́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐b̸̟̯̄̆̉ó̵̳̺̒̚ẅ̴̫́̽̿̂ G̷̛̜̏̾̔ľ̶̖̙̎̐ō̸̟̯̆̉ẃ̵̳̺̒̚ë̴̫́̽̿̂", "https://pastebin.com/raw/G9y0Nu2h")
-addMorphButton("B̴̫̈́̽̿̂ȁ̷̛̜̾̔ň̶̖̙̎̐ī̸̟̯̆̉ś̵̳̺̒̚ḧ̴̫́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://pastebin.com/raw/nHN5eMQx")
-addMorphButton("W̶̖̙̌̎̐h̸̟̯̄̆̉í̵̳̺̒̚ẗ̴̫́̽̿̂ȅ̷̛̜̾̔ š̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚k̴̫̈́̽̿̂l̷̛̜̏̾̔ě̶̖̙̎̐", "https://pastebin.com/raw/xHaWXEqA")
-addMorphButton("R̸̟̯̄̆̉á̵̳̺̒̚ḯ̴̫̽̿̂n̷̛̜̏̾̔b̶̖̙̌̎̐ō̸̟̯̆̉ẃ̵̳̺̒̚ K̴̫̈́̽̿̂ȉ̷̛̜̾̔ň̶̖̙̎̐ḡ̸̟̯̆̉", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher")
-addMorphButton("S̴̫̈́̽̿̂p̷̛̜̏̾̔ě̶̖̙̎̐c̸̟̯̄̆̉t̵̳̺́̒̚r̴̫̈́̽̿̂ư̷̜̏̾̔m̶̖̙̌̎̐ Ḡ̸̟̯̆̉ĺ̵̳̺̒̚ḯ̴̫̽̿̂t̷̛̜̏̾̔č̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/sr")
-addMorphButton("J̷̛̜̏̾̔ǒ̶̖̙̎̐h̸̟̯̄̆̉ń̵̳̺̒̚ d̴̫̈́̽̿̂ơ̷̜̏̾̔ě̶̖̙̎̐", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/John-doe/refs/heads/main/John%20doe")
-addMorphButton("M̸̟̯̄̆̉ŕ̵̳̺̒̚ b̴̫̈́̽̿̂y̷̛̜̏̾̔ě̶̖̙̎̐ b̸̟̯̄̆̉ý̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Mr-bye-bye/refs/heads/main/Mr%20bye%20bye")
-addMorphButton("H̷̛̜̏̾̔ǎ̶̖̙̎̐l̸̟̯̄̆̉ĺ̵̳̺̒̚ö̴̫́̽̿̂w̷̛̜̏̾̔ Š̶̖̙̎̐l̸̟̯̄̆̉á̵̳̺̒̚ÿ̴̫́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/HSlayer")
-addMorphButton("L̸̟̯̄̆̉ú̵̳̺̒̚n̴̫̈́̽̿̂ȁ̷̛̜̾̔ť̶̖̙̎̐ī̸̟̯̆̉ć̵̳̺̒̚", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/lunatic")
-addMorphButton("Ř̶̖̙̎̐ē̸̟̯̆̉f̵̳̺́̒̚ǘ̴̫̽̿̂l̷̛̜̏̾̔ǧ̶̖̙̎̐ē̸̟̯̆̉ń̵̳̺̒̚c̴̫̈́̽̿̂ȅ̷̛̜̾̔", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/light")
-addMorphButton("S̷̛̜̏̾̔ǔ̶̖̙̎̐k̸̟̯̄̆̉ú̵̳̺̒̚n̴̫̈́̽̿̂ȁ̷̛̜̾̔", "https://pastebin.com/raw/iW2Gg6Hh")
-addMorphButton("Ǔ̶̖̙̎̐l̸̟̯̄̆̉t̵̳̺́̒̚ḯ̴̫̽̿̂m̷̛̜̏̾̔ǎ̶̖̙̎̐t̸̟̯̄̆̉é̵̳̺̒̚ D̴̫̈́̽̿̂ơ̷̜̏̾̔m̶̖̙̌̎̐ī̸̟̯̆̉ń̵̳̺̒̚ǘ̴̫̽̿̂s̷̛̜̏̾̔", "https://pastebin.com/raw/gBFyvYzQ")
-addMorphButton("M̸̟̯̄̆̉ŕ̵̳̺̒̚.p̴̫̈́̽̿̂ȉ̷̛̜̾̔x̶̖̙̌̎̐ē̸̟̯̆̉ĺ̵̳̺̒̚s̴̫̈́̽̿̂", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Mr.Pixels.lua")
-addMorphButton("P̷̛̜̏̾̔ǔ̶̖̙̎̐r̸̟̯̄̆̉ṕ̵̳̺̒̚l̴̫̈́̽̿̂ȅ̷̛̜̾̔ Ȟ̶̖̙̎̐ā̸̟̯̆̉ń̵̳̺̒̚d̴̫̈́̽̿̂", "https://pastebin.com/raw/cF3S1FVV")
-addMorphButton("L̷̛̜̏̾̔ǒ̶̖̙̎̐v̸̟̯̄̆̉é̵̳̺̒̚ G̴̫̈́̽̿̂l̷̛̜̏̾̔ǒ̶̖̙̎̐w̸̟̯̄̆̉é̵̳̺̒̚", "https://pastebin.com/raw/AaNuC7H8")
-addMorphButton("P̶̖̙̌̎̐ū̸̟̯̆̉ḿ̵̳̺̒̚p̴̫̈́̽̿̂k̷̛̜̏̾̔ǐ̶̖̙̎̐n̸̟̯̄̆̉ Ó̵̳̺̒̚v̴̫̈́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐s̸̟̯̄̆̉é̵̳̺̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔", "https://pastebin.com/raw/sX25byLe")
-addMorphButton("Ḱ̵̳̺̒̚ḯ̴̫̽̿̂t̷̛̜̏̾̔č̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚n̴̫̈́̽̿̂ g̷̛̜̏̾̔ǔ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/nicolasbarbosa323/rare/refs/heads/main/kitcher%20gun.lua")
-addMorphButton("R̴̫̈́̽̿̂ȅ̷̛̜̾̔ď̶̖̙̎̐ S̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂ d̷̛̜̏̾̔ř̶̖̙̎̐ā̸̟̯̆̉ǵ̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔", "https://raw.githubusercontent.com/nicolasbarbosa323/sin-dragon/refs/heads/main/Fe_sin_dragon_music_customizado_final.lua")
-addMorphButton("G̷̛̜̏̾̔ǎ̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ ȟ̶̖̙̎̐ā̸̟̯̆̉ń̵̳̺̒̚d̴̫̈́̽̿̂s̷̛̜̏̾̔", "https://raw.githubusercontent.com/nicolasbarbosa323/good-cop-bad-coop/refs/heads/main/GasterHands.txt")
-addMorphButton("Ǧ̶̖̙̎̐ā̸̟̯̆̉ĺ̵̳̺̒̚ä̴̫́̽̿̂x̷̛̜̏̾̔y̶̖̙̌̎̐ b̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂ȉ̷̛̜̾̔š̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂ g̷̛̜̏̾̔ǔ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Galaxy-banisher-gun/refs/heads/main/Galaxy%20banisher")
-addMorphButton("J̸̟̯̄̆̉ó̵̳̺̒̚ḧ̴̫́̽̿̂n̷̛̜̏̾̔ Ď̶̖̙̎̐ō̸̟̯̆̉é̵̳̺̒̚ R̴̫̈́̽̿̂ȅ̷̛̜̾̔m̶̖̙̌̎̐ā̸̟̯̆̉ḱ̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
-addMorphButton("X̷̛̜̏̾̔ě̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ Ř̶̖̙̎̐ē̸̟̯̆̉ḿ̵̳̺̒̚ä̴̫́̽̿̂k̷̛̜̏̾̔ě̶̖̙̎̐", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
+addMorphButton("Terra God", "https://pastebin.com/raw/c8rm3KUT")
+addMorphButton("Shrike", "https://pastebin.com/raw/L9s88W5u")
+addMorphButton("Burning Hope", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Burning%20Hope")
+addMorphButton("Lost Hope Scythe", "https://pastebin.com/raw/UYM7Lx4n")
+addMorphButton("Sin Dragon", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Sin%20Dragon.lua")
+addMorphButton("Goner", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Goner/refs/heads/main/Goner")
+addMorphButton("Internal war", "https://pastebin.com/raw/tiDrRmiz")
+addMorphButton("Blind Reaper", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/BLINDREAPER")
+addMorphButton("Chrono Sentinel", "https://raw.githubusercontent.com/Lock1213/Scripts/refs/heads/main/Chrono%20Sentinel%20(Converted%20With%20Music)")
+addMorphButton("Dual Ultima", "https://pastebin.com/raw/3QsB07Ba")
+addMorphButton("Comedic Chaos", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Comedy")
+addMorphButton("Road Rogue", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Road-Rogue/refs/heads/main/Road%20Rogue")
+addMorphButton("God Slayer", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/God%20Eater")
+addMorphButton("Xester", "https://raw.githubusercontent.com/Icalock/Server/refs/heads/main/Xester%20FD.txt")
+addMorphButton("Ban Hammer", "https://pastebin.com/raw/xLHUcVjx")
+addMorphButton("The Last God", "https://pastebin.com/raw/TLWkKzPH")
+addMorphButton("Red S+", "https://pastebin.com/raw/bmKGtHQF")
+addMorphButton("Red Ultima", "https://pastebin.com/raw/njqct98T")
+addMorphButton("Black Dominus", "https://pastebin.com/raw/qAkxQx18")
+addMorphButton("Vereus", "https://rawscripts.net/raw/Universal-Script-Roblox-VEREUS-monster-script-3746")
+addMorphButton("Killbot", "https://pastebin.com/raw/8spCXuEU")
+addMorphButton("Killbot V2", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/KillbotV2")
+addMorphButton("Rebellion", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Pharoh")
+addMorphButton("Neptunian V", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/NepV")
+addMorphButton("Caducus", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/CADUCUS%20(FIXED)")
+addMorphButton("Ruin EX", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/RUIN%20EX")
+addMorphButton("Ender", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Ender")
+addMorphButton("Brick hamman", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Brick-hamman/refs/heads/main/Brick%20hamman")
+addMorphButton("Cleetus", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Cleetus/refs/heads/main/Cleetus")
+addMorphButton("Genkaada Omega Sword", "https://raw.githubusercontent.com/nicolasbarbosa323/grakkeda/refs/heads/main/Roblox%20Genkadda%20omega%20leaked.txt")
+addMorphButton("Devil Glove", "https://pastebin.com/raw/GZWtWL0y")
+addMorphButton("Chaotic God", "https://pastebin.com/raw/ygMBF5G6")
+addMorphButton("Green wings", "https://pastebin.com/raw/X3Y7adwk")
+addMorphButton("Blue Sickle", "https://pastebin.com/raw/Yk5xGGyD")
+addMorphButton("Legendary Sickle", "https://pastebin.com/raw/7qNpiSQs")
+addMorphButton("X sword", "https://pastebin.com/raw/6dw0wuc1")
+addMorphButton("Purple Sword", "https://pastebin.com/raw/kC0DdRS7")
+addMorphButton("Omni God", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God")
+addMorphButton("Zenatic", "https://pastebin.com/raw/8WiaahB7")
+addMorphButton("Iron hand", "https://pastebin.com/raw/0HKHHPJV")
+addMorphButton("All Seeing Hand", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand")
+addMorphButton("Oculus", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Oculus")
+addMorphButton("Determination", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Determination")
+addMorphButton("Hacker X", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Hacker%20X")
+addMorphButton("Rainbow Glowe", "https://pastebin.com/raw/G9y0Nu2h")
+addMorphButton("Banisher", "https://pastebin.com/raw/nHN5eMQx")
+addMorphButton("White sickle", "https://pastebin.com/raw/xHaWXEqA")
+addMorphButton("Rainbow King", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher")
+addMorphButton("Spectrum Glitcher", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/sr")
+addMorphButton("John doe", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/John-doe/refs/heads/main/John%20doe")
+addMorphButton("Mr bye bye", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Mr-bye-bye/refs/heads/main/Mr%20bye%20bye")
+addMorphButton("Hallow Slayer", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/HSlayer")
+addMorphButton("Lunatic", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/lunatic")
+addMorphButton("Refulgence", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/light")
+addMorphButton("Sukuna", "https://pastebin.com/raw/iW2Gg6Hh")
+addMorphButton("Ultimate Dominus", "https://pastebin.com/raw/gBFyvYzQ")
+addMorphButton("Mr.pixels", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Mr.Pixels.lua")
+addMorphButton("Purple Hand", "https://pastebin.com/raw/cF3S1FVV")
+addMorphButton("Rainbow Glowe", "https://pastebin.com/raw/377urnW7")
+addMorphButton("Love Glowe", "https://pastebin.com/raw/AaNuC7H8")
+addMorphButton("Pumpkin Overseer", "https://pastebin.com/raw/sX25byLe")
+addMorphButton("Kitchen gun", "https://raw.githubusercontent.com/nicolasbarbosa323/rare/refs/heads/main/kitcher%20gun.lua")
+addMorphButton("Red Sin dragon", "https://raw.githubusercontent.com/nicolasbarbosa323/sin-dragon/refs/heads/main/Fe_sin_dragon_music_customizado_final.lua")
+addMorphButton("Gaster hands", "https://raw.githubusercontent.com/nicolasbarbosa323/good-cop-bad-coop/refs/heads/main/GasterHands.txt")
+addMorphButton("Galaxy banisher gun", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Galaxy-banisher-gun/refs/heads/main/Galaxy%20banisher")
+addMorphButton("John Doe (Remake)", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
+addMorphButton("Xester (Remake)", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
 
 local hacklordBtn = Instance.new("TextButton", morphsScroll)
 hacklordBtn.Size = UDim2.new(1,0,1,0)
-hacklordBtn.Text = "H̷̛̜̏̾̔ǎ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚l̴̫̈́̽̿̂ơ̷̜̏̾̔ř̶̖̙̎̐d̸̟̯̄̆̉"
+hacklordBtn.Text = "Hacklord"
 hacklordBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 hacklordBtn.TextColor3 = Color3.fromRGB(230,230,230)
 hacklordBtn.Font = Enum.Font.Gotham
-hacklordBtn.TextSize = 12
+hacklordBtn.TextSize = 13
 hacklordBtn.MouseButton1Click:Connect(function()
-	executeWithHorror("https://raw.githubusercontent.com/sharipovdaniyal81-hash/Hacklord/refs/heads/main/Hacklord")
+	click()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/sharipovdaniyal81-hash/Hacklord/refs/heads/main/Hacklord"))()
 end)
+registerText(hacklordBtn)
 
 -- MISC
 local miscContainer = Instance.new("Frame", misc)
@@ -526,12 +562,13 @@ miscContainer.ClipsDescendants = true
 local miscLabel = Instance.new("TextLabel", miscContainer)
 miscLabel.Size = UDim2.new(1,0,0,30)
 miscLabel.BackgroundTransparency = 1
-miscLabel.Text = Z.misc
+miscLabel.Text = "Misc"
 miscLabel.TextColor3 = Color3.fromRGB(255,255,255)
 miscLabel.Font = Enum.Font.GothamBold
 miscLabel.TextSize = 16
 miscLabel.TextXAlignment = Enum.TextXAlignment.Left
 miscLabel.Position = UDim2.new(0,10,0,5)
+registerText(miscLabel)
 
 local miscScroll = Instance.new("ScrollingFrame", miscContainer)
 miscScroll.Size = UDim2.new(1,0,1,-40)
@@ -545,21 +582,23 @@ miscGrid.CellSize = UDim2.new(0.9,0,0,30)
 miscGrid.CellPadding = UDim2.new(0,5,0,5)
 miscGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-local function addMiscButton(name, url)
+local function addMiscButton(nm, url)
 	local btn = Instance.new("TextButton", miscScroll)
 	btn.Size = UDim2.new(1,0,1,0)
-	btn.Text = name
+	btn.Text = nm
 	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 	btn.TextColor3 = Color3.fromRGB(230,230,230)
 	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 12
+	btn.TextSize = 13
 	btn.MouseButton1Click:Connect(function()
-		executeWithHorror(url)
+		click()
+		loadstring(game:HttpGet(url))()
 	end)
+	registerText(btn)
 end
 
-addMiscButton("K̷̛̜̏̾̔ě̶̖̙̎̐ȳ̸̟̯̆̉b̵̳̺́̒̚ö̴̫́̽̿̂ȁ̷̛̜̾̔ř̶̖̙̎̐d̸̟̯̄̆̉", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
-addMiscButton("Ŕ̵̳̺̒̚6̴̫̈́̽̿̂", "https://raw.githubusercontent.com/LeathalMurd/Roblox-R15-To-R6/refs/heads/main/Converter.lua")
+addMiscButton("Keyboard", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
+addMiscButton("R6", "https://raw.githubusercontent.com/LeathalMurd/Roblox-R15-To-R6/refs/heads/main/Converter.lua")
 
 -- GUI
 local guiContainer = Instance.new("Frame", guiPage)
@@ -571,12 +610,13 @@ guiContainer.ClipsDescendants = true
 local guiLabel = Instance.new("TextLabel", guiContainer)
 guiLabel.Size = UDim2.new(1,0,0,30)
 guiLabel.BackgroundTransparency = 1
-guiLabel.Text = Z.gui
+guiLabel.Text = "GUI"
 guiLabel.TextColor3 = Color3.fromRGB(255,255,255)
 guiLabel.Font = Enum.Font.GothamBold
 guiLabel.TextSize = 16
 guiLabel.TextXAlignment = Enum.TextXAlignment.Left
 guiLabel.Position = UDim2.new(0,10,0,5)
+registerText(guiLabel)
 
 local guiScroll = Instance.new("ScrollingFrame", guiContainer)
 guiScroll.Size = UDim2.new(1,0,1,-40)
@@ -590,39 +630,27 @@ guiGrid.CellSize = UDim2.new(0.9,0,0,30)
 guiGrid.CellPadding = UDim2.new(0,5,0,5)
 guiGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-local function addGuiButton(name, url)
+local function addGuiButton(nm, url)
 	local btn = Instance.new("TextButton", guiScroll)
 	btn.Size = UDim2.new(1,0,1,0)
-	btn.Text = name
+	btn.Text = nm
 	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 	btn.TextColor3 = Color3.fromRGB(230,230,230)
 	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 12
+	btn.TextSize = 13
 	btn.MouseButton1Click:Connect(function()
-		executeWithHorror(url)
+		click()
+		loadstring(game:HttpGet(url))()
 	end)
+	registerText(btn)
 end
 
-addGuiButton("F̷̛̜̏̾̔ľ̶̖̙̎̐ȳ̸̟̯̆̉ Ǵ̵̳̺̒̚Ǘ̴̫̽̿̂Ȉ̷̛̜̾̔", "https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui")
-addGuiButton("N̸̟̯̄̆̉Ṕ̵̳̺̒̚S̴̫̈́̽̿̂ S̷̛̜̏̾̔p̶̖̙̌̎̐ā̸̟̯̆̉ẃ̵̳̺̒̚n̴̫̈́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
+addGuiButton("Fly GUI", "https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui")
+addGuiButton("NPS Spawner", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
 
 -- ============================================================
--- ФОНОВЫЕ ЭФФЕКТЫ: случайные глитчи и скримеры
+-- ФОНОВОЕ ПЕРЕЛИВАНИЕ
 -- ============================================================
-
-task.spawn(function()
-	while true do
-		task.wait(math.random(30, 90)) -- каждые 30-90 сек
-		if math.random() < 0.5 then
-			glitchCharacter(0.7)
-		end
-		if math.random() < 0.15 then
-			jumpscare()
-		end
-	end
-end)
-
--- Переливание фона хаба (как раньше)
 local function tweenColor(object, color1, color2, duration)
 	while true do
 		TweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear), {BackgroundColor3 = color2}):Play()
@@ -641,4 +669,36 @@ task.spawn(function()
 		TweenService:Create(stroke, TweenInfo.new(6.67, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(150,50,200)}):Play()
 		task.wait(6.67)
 	end
+end)
+
+-- ============================================================
+-- ГЛАВНАЯ ЛОГИКА: ГЛИТЧИ + СКРИМЕР
+-- ============================================================
+task.spawn(function()
+	task.wait(GLITCH_START_AT)
+	while not jumpscareFiredGlobal do
+		local elapsed = tick() - SESSION_START
+		local progress = math.clamp(elapsed / JUMPSCARE_AT, 0, 1)
+
+		local intensity = 0.6 + progress * 1.5
+		local duration  = 0.4 + progress * 1.2
+
+		cameraShake(intensity, duration)
+
+		if math.random() < 0.7 then
+			characterLag(duration * 0.6)
+		end
+
+		local waitTime = math.random(6, 14) * (1 - progress * 0.7)
+		task.wait(waitTime)
+	end
+end)
+
+jumpscareFiredGlobal = false
+task.spawn(function()
+	while tick() - SESSION_START < JUMPSCARE_AT do
+		task.wait(0.5)
+	end
+	jumpscareFiredGlobal = true
+	jumpscare()
 end)
