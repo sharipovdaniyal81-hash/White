@@ -40,33 +40,28 @@ local GLITCH_START_AT = 15
 local JUMPSCARE_AT   = 60
 
 -- ============================================================
--- ПРОГРЕССИВНОЕ ИСКАЖЕНИЕ ТЕКСТА
+-- ПОРЧА ТЕКСТА
 -- ============================================================
--- Уровень порчи: 0.0 — чистый текст, 1.0 — полная нечитка
 local corruptionLevel = 0
 
--- Пул залго-символов (верхние + нижние комбинирующие)
-local ZALGO_TOP = {
-	"\204\128","\204\129","\204\130","\204\131","\204\132","\204\133",
-	"\204\134","\204\135","\204\136","\204\137","\204\138","\204\139",
-	"\204\140","\204\141","\204\142","\204\143","\204\144","\204\145",
+-- Тяжёлые пулы (для максимального ужаса после скримера)
+local HEAVY_TOP = {
+	"\204\128","\204\129","\204\130","\204\131","\204\132","\204\133","\204\134",
+	"\204\135","\204\136","\204\137","\204\138","\204\139","\204\140","\204\141",
+	"\204\142","\204\143","\204\144","\204\145",
 }
-local ZALGO_BOT = {
-	"\204\150","\204\151","\204\152","\204\153","\204\154","\204\155",
-	"\204\156","\204\157","\204\158","\204\159","\204\160","\204\161",
-	"\204\162","\204\163","\204\164","\204\165","\204\166","\204\167",
-	"\204\168","\204\169","\204\170","\204\171","\204\172","\204\173",
-	"\204\174","\204\175","\204\176","\204\177","\204\178","\204\179",
+local HEAVY_BOT = {
+	"\204\150","\204\151","\204\152","\204\153","\204\154","\204\155","\204\156",
+	"\204\157","\204\158","\204\159","\204\160","\204\161","\204\162","\204\163",
+	"\204\164","\204\165","\204\166","\204\167","\204\168","\204\169","\204\170",
+	"\204\171","\204\172","\204\173","\204\174","\204\175","\204\176","\204\177",
 }
 
--- Наложить залго на строку с интенсивностью 0..1
--- 0    → без изменений
--- 0.3  → 2 метки на букву (читаемо, жутко)
--- 0.6  → 5 меток (еле читаемо)
--- 1.0  → 12+ меток (полная каша)
+-- Очень плотная порча: 30+ меток на букву когда level=1
 local function corruptText(text, level)
 	if level <= 0 then return text end
-	local marksPerChar = math.floor(level * 13)  -- 0..13 меток
+	-- При level=1 — 30 меток на букву, при 0.3 — 9, при 0.15 — 4
+	local marksPerChar = math.floor(level * 30)
 	if marksPerChar <= 0 then return text end
 
 	local out = ""
@@ -75,11 +70,10 @@ local function corruptText(text, level)
 		out = out .. c
 		if c ~= " " and c ~= "\n" then
 			for _ = 1, marksPerChar do
-				-- 50/50 верхняя или нижняя метка — "разбросанно"
 				if math.random() < 0.5 then
-					out = out .. ZALGO_TOP[math.random(1, #ZALGO_TOP)]
+					out = out .. HEAVY_TOP[math.random(1, #HEAVY_TOP)]
 				else
-					out = out .. ZALGO_BOT[math.random(1, #ZALGO_BOT)]
+					out = out .. HEAVY_BOT[math.random(1, #HEAVY_BOT)]
 				end
 			end
 		end
@@ -87,13 +81,11 @@ local function corruptText(text, level)
 	return out
 end
 
--- Реестр всех текстов
 local trackedTexts = {}
 local function registerText(label)
 	table.insert(trackedTexts, {label = label, orig = label.Text})
 end
 
--- Обновить всё UI по текущему уровню порчи
 local function refreshAllText()
 	for _, item in ipairs(trackedTexts) do
 		pcall(function()
@@ -103,32 +95,27 @@ local function refreshAllText()
 end
 
 -- ============================================================
--- ФОН: рост порчи со временем
+-- РОСТ ПОРЧИ
 -- ============================================================
 task.spawn(function()
-	while corruptionLevel < 1 do
+	while true do
 		task.wait(0.5)
 		local elapsed = tick() - SESSION_START
 
-		-- До 15 сек — идеально чисто
 		if elapsed < GLITCH_START_AT then
 			corruptionLevel = 0
-		else
-			-- От 15 до 60 — плавно от 0.15 до 1.0
+		elseif elapsed < JUMPSCARE_AT then
 			local t = (elapsed - GLITCH_START_AT) / (JUMPSCARE_AT - GLITCH_START_AT)
-			corruptionLevel = math.clamp(0.15 + t * 0.85, 0, 1)
+			corruptionLevel = math.clamp(0.1 + t * 0.4, 0, 0.5)  -- до 0.5 перед скримером
 		end
+		-- После скримера corruptionLevel станет 1.0 (устанавливается в jumpscare-функции)
 
 		refreshAllText()
 	end
-
-	-- После 60 — навсегда 1.0 (полная каша)
-	corruptionLevel = 1
-	refreshAllText()
 end)
 
 -- ============================================================
--- ГЛИТЧ: ТРЯСКА КАМЕРЫ
+-- ТРЯСКА КАМЕРЫ
 -- ============================================================
 local shakeActive = false
 local shakeIntensity = 0
@@ -158,7 +145,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ============================================================
--- ГЛИТЧ: ПЕРСОНАЖ ПОДЛАГИВАЕТ
+-- ПОДЛАГИВАНИЕ ПЕРСОНАЖА
 -- ============================================================
 local function characterLag(duration)
 	local char = player.Character
@@ -207,79 +194,123 @@ local function characterLag(duration)
 end
 
 -- ============================================================
--- СКРИМЕР
+-- СКРИМЕР: ЖЁЛТЫЙ ЭКРАН С ПОДМИГИВАНИЯМИ
 -- ============================================================
 local jumpscareBusy = false
+local jumpscareFired = false
 local function jumpscare()
 	if jumpscareBusy then return end
 	jumpscareBusy = true
 
+	-- 1. Показываем скример — жёлтый экран
 	local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 	sg.Name = "JS_"..tick()
 	sg.IgnoreGuiInset = true
 	sg.DisplayOrder = 2147483647
 	sg.ResetOnSpawn = false
 
+	-- Основной фон — ЖЁЛТЫЙ
 	local frame = Instance.new("Frame", sg)
 	frame.Size = UDim2.new(1,0,1,0)
-	frame.BackgroundColor3 = Color3.fromRGB(255,0,0)
+	frame.BackgroundColor3 = Color3.fromRGB(255,230,0)
 	frame.BorderSizePixel = 0
+	frame.ZIndex = 1
 
-	local txt = Instance.new("TextLabel", frame)
-	txt.Size = UDim2.new(1,0,1,0)
-	txt.BackgroundTransparency = 1
-	txt.Text = corruptText("YOU ARE HACKED\nWAKE UP\nWAKE UP\nWAKE UP\nWAKE UP", 1)
-	txt.TextColor3 = Color3.fromRGB(255,255,255)
-	txt.Font = Enum.Font.GothamBlack
-	txt.TextScaled = true
-	txt.TextWrapped = true
+	-- Слой "подмигиваний" — чёрные полосы/крики, мигающие поверх жёлтого
+	local blinker = Instance.new("Frame", sg)
+	blinker.Size = UDim2.new(1,0,1,0)
+	blinker.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	blinker.BackgroundTransparency = 1
+	blinker.BorderSizePixel = 0
+	blinker.ZIndex = 2
 
+	-- Жуткое "лицо" из символов
+	local face = Instance.new("TextLabel", frame)
+	face.Size = UDim2.new(1,0,1,0)
+	face.BackgroundTransparency = 1
+	face.Text = corruptText("WAKE UP\nYOU ARE HACKED\nWAKE UP\nDON'T LOOK AWAY", 1)
+	face.TextColor3 = Color3.fromRGB(0,0,0)
+	face.Font = Enum.Font.GothamBlack
+	face.TextScaled = true
+	face.TextWrapped = true
+	face.ZIndex = 3
+
+	-- Второй слой текста (для "дрожания")
+	local face2 = Instance.new("TextLabel", frame)
+	face2.Size = UDim2.new(1,0,1,0)
+	face2.BackgroundTransparency = 1
+	face2.Text = corruptText("WAKE UP\nYOU ARE HACKED\nWAKE UP\nDON'T LOOK AWAY", 1)
+	face2.TextColor3 = Color3.fromRGB(255,0,0)
+	face2.Font = Enum.Font.GothamBlack
+	face2.TextScaled = true
+	face2.TextWrapped = true
+	face2.ZIndex = 4
+	face2.Position = UDim2.new(0.005, 0, 0.005, 0)
+
+	-- ЗВУК: пищащий взлом
 	local snd = Instance.new("Sound", sg)
 	snd.SoundId = "rbxassetid://9120386436"
-	snd.Volume = 7
-	snd.PlaybackSpeed = 1.8
+	snd.Volume = 8
+	snd.PlaybackSpeed = 2.0
 	snd.Looped = true
 	snd.PlayOnRemove = true
 	snd:Play()
 
 	local snd2 = Instance.new("Sound", sg)
 	snd2.SoundId = "rbxassetid://131237241"
-	snd2.Volume = 5
-	snd2.PlaybackSpeed = 2.5
+	snd2.Volume = 6
+	snd2.PlaybackSpeed = 3.0
 	snd2.Looped = true
 	snd2.PlayOnRemove = true
 	snd2:Play()
 
+	-- ЦИКЛ ПОДМИГИВАНИЙ: чёрное ↔ жёлтое ↔ красное
 	task.spawn(function()
 		local t0 = tick()
-		while tick() - t0 < 2.5 do
-			frame.BackgroundColor3 = Color3.fromRGB(
-				math.random(30,255),
-				math.random(0,80),
-				math.random(100,255)
-			)
-			txt.TextColor3 = Color3.fromRGB(
-				math.random(180,255),
-				math.random(180,255),
-				math.random(180,255)
-			)
-			task.wait(math.random(3,8)/100)
+		while tick() - t0 < 3 do
+			local r = math.random()
+			if r < 0.4 then
+				-- Чёрная вспышка
+				blinker.BackgroundColor3 = Color3.fromRGB(0,0,0)
+				blinker.BackgroundTransparency = 0
+				frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+			elseif r < 0.7 then
+				-- Жёлтая
+				blinker.BackgroundTransparency = 1
+				frame.BackgroundColor3 = Color3.fromRGB(255,230,0)
+			else
+				-- Красная
+				blinker.BackgroundTransparency = 1
+				frame.BackgroundColor3 = Color3.fromRGB(255,0,0)
+			end
+			task.wait(math.random(3,9)/100)
 		end
 	end)
 
+	-- Дрожание обоих текстов
 	task.spawn(function()
 		local t0 = tick()
-		while tick() - t0 < 2.5 do
-			frame.Position = UDim2.new((math.random()-0.5)*0.05, 0, (math.random()-0.5)*0.05, 0)
-			task.wait(0.03)
+		while tick() - t0 < 3 do
+			face.Position = UDim2.new((math.random()-0.5)*0.04, 0, (math.random()-0.5)*0.04, 0)
+			face2.Position = UDim2.new(0.005+(math.random()-0.5)*0.04, 0, 0.005+(math.random()-0.5)*0.04, 0)
+			task.wait(0.025)
 		end
 	end)
 
-	task.delay(2.5, function()
+	-- ТРЯСКА КАМЕРЫ НА МАКСИМУМ
+	cameraShake(3.5, 3)
+	characterLag(1.5)
+
+	-- 2. ПОСЛЕ СКРИМЕРА — ПОРЧА = 1.0 (максимум)
+	task.delay(3, function()
 		pcall(function() snd:Destroy() end)
 		pcall(function() snd2:Destroy() end)
 		pcall(function() sg:Destroy() end)
 		jumpscareBusy = false
+
+		-- СТАВИМ МАКСИМАЛЬНУЮ ПОРЧУ
+		corruptionLevel = 1.0
+		refreshAllText()
 	end)
 end
 
@@ -649,7 +680,7 @@ addGuiButton("Fly GUI", "https://raw.githubusercontent.com/makkurokurosukescript
 addGuiButton("NPS Spawner", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
 
 -- ============================================================
--- ФОНОВОЕ ПЕРЕЛИВАНИЕ
+-- ПЕРЕЛИВАНИЕ ФОНА
 -- ============================================================
 local function tweenColor(object, color1, color2, duration)
 	while true do
@@ -672,11 +703,11 @@ task.spawn(function()
 end)
 
 -- ============================================================
--- ГЛАВНАЯ ЛОГИКА: ГЛИТЧИ + СКРИМЕР
+-- ГЛИТЧИ
 -- ============================================================
 task.spawn(function()
 	task.wait(GLITCH_START_AT)
-	while not jumpscareFiredGlobal do
+	while not jumpscareFired do
 		local elapsed = tick() - SESSION_START
 		local progress = math.clamp(elapsed / JUMPSCARE_AT, 0, 1)
 
@@ -694,11 +725,13 @@ task.spawn(function()
 	end
 end)
 
-jumpscareFiredGlobal = false
+-- ============================================================
+-- ЗАПУСК СКРИМЕРА ЧЕРЕЗ 60 СЕК
+-- ============================================================
 task.spawn(function()
 	while tick() - SESSION_START < JUMPSCARE_AT do
 		task.wait(0.5)
 	end
-	jumpscareFiredGlobal = true
+	jumpscareFired = true
 	jumpscare()
 end)
