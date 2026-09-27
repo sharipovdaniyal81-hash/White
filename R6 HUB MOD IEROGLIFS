@@ -2,6 +2,7 @@ repeat task.wait() until game.Players.LocalPlayer
 
 local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "R6Hub"
@@ -31,6 +32,235 @@ local function click()
 	s:Destroy()
 end
 
+-- ============================================================
+-- ЖУТКИЕ ЭФФЕКТЫ
+-- ============================================================
+
+-- Пул залго-символов для "наложения" поверх текста
+local ZALGO_POOLS = {
+	"\204\143\204\190\204\148\204\155\204\156\204\150",
+	"\204\140\204\150\204\154\204\153\204\175",
+	"\204\139\204\144\204\153\204\146\204\176",
+	"\204\148\204\160\204\153\204\186\204\180",
+	"\204\143\204\144\204\154\204\160\204\163\204\153\204\175",
+}
+-- Обёртка залго для любой строки (без генератора, только предзаготовленные пулы)
+local function zalgo(text)
+	local out = ""
+	local idx = 1
+	for i = 1, #text do
+		local c = text:sub(i,i)
+		out = out .. c
+		if c ~= " " then
+			out = out .. ZALGO_POOLS[((idx-1) % #ZALGO_POOLS) + 1]
+			idx = idx + 1
+		end
+	end
+	return out
+end
+
+-- Функция: глитч персонажа (анимации ломаются + CFrame дёргается)
+local function glitchCharacter(intensity)
+	intensity = intensity or 1
+	local char = player.Character
+	if not char then return end
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not hrp then return end
+
+	-- Ломаем играющиеся анимации
+	if hum then
+		local animator = hum:FindFirstChildOfClass("Animator")
+		if animator then
+			local tracks = animator:GetPlayingAnimationTracks()
+			for _, t in ipairs(tracks) do
+				pcall(function() t:AdjustSpeed(0) end)
+			end
+			task.wait(math.random(5,20)/100)
+			for _, t in ipairs(tracks) do
+				pcall(function()
+					t:AdjustSpeed(math.random(0,50)/10 - 2) -- иногда назад, иногда ускоренно
+				end)
+			end
+			task.wait(math.random(10,25)/100)
+			for _, t in ipairs(tracks) do
+				pcall(function() t:AdjustSpeed(1) end)
+			end
+		end
+	end
+
+	-- Дёргаем CFrame в стороны
+	local startCF = hrp.CFrame
+	for i = 1, math.random(3,8)*intensity do
+		hrp.CFrame = startCF * CFrame.new(
+			(math.random()-0.5)*0.8,
+			(math.random()-0.5)*0.8,
+			(math.random()-0.5)*0.8
+		) * CFrame.Angles(
+			(math.random()-0.5)*0.3,
+			(math.random()-0.5)*0.3,
+			(math.random()-0.5)*0.3
+		)
+		task.wait(0.02 + math.random()*0.03)
+	end
+	hrp.CFrame = startCF
+
+	-- Рандомная "тряска" гуманоида (платформеры / R6 поддерживают)
+	pcall(function()
+		hum.PlatformStand = true
+		task.wait(math.random(8,20)/100)
+		hum.PlatformStand = false
+	end)
+end
+
+-- Функция: СКРИМЕР — полноэкранный, переливающиеся цвета + пищащий звук
+local jumpscareActive = false
+local function jumpscare()
+	if jumpscareActive then return end
+	jumpscareActive = true
+
+	local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	sg.Name = "JUMPSCARE_"..tick()
+	sg.IgnoreGuiInset = true
+	sg.DisplayOrder = 2147483647
+	sg.ResetOnSpawn = false
+
+	-- Фон с переливающимися цветами
+	local frame = Instance.new("Frame", sg)
+	frame.Size = UDim2.new(1,0,1,0)
+	frame.Position = UDim2.new(0,0,0,0)
+	frame.BackgroundColor3 = Color3.fromRGB(255,0,0)
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 1
+
+	-- Жуткий текст по центру
+	local txt = Instance.new("TextLabel", frame)
+	txt.Size = UDim2.new(1,0,1,0)
+	txt.BackgroundTransparency = 1
+	txt.Text = zalgo("YOU ARE HACKED") .. "\n" .. zalgo("WAKE UP") .. "\n" .. zalgo("WAKE UP") .. "\n" .. zalgo("WAKE UP")
+	txt.TextColor3 = Color3.fromRGB(255,255,255)
+	txt.Font = Enum.Font.GothamBlack
+	txt.TextScaled = true
+	txt.TextWrapped = true
+	txt.ZIndex = 2
+
+	-- Пищащий "взлом" звук (растущий pitch)
+	local snd = Instance.new("Sound", sg)
+	snd.SoundId = "rbxassetid://9120386436" -- screech
+	snd.Volume = 7
+	snd.PlaybackSpeed = 1.8
+	snd.Looped = true
+	snd.PlayOnRemove = true
+	snd:Play()
+
+	-- Дополнительный высокочастотный писк
+	local snd2 = Instance.new("Sound", sg)
+	snd2.SoundId = "rbxassetid://131237241" -- high pitch screech
+	snd2.Volume = 5
+	snd2.PlaybackSpeed = 2.5
+	snd2.Looped = true
+	snd2.PlayOnRemove = true
+	snd2:Play()
+
+	-- Переливание цветов (быстрое)
+	task.spawn(function()
+		local t0 = tick()
+		while tick() - t0 < 1.8 do
+			frame.BackgroundColor3 = Color3.fromRGB(
+				math.random(30,255),
+				math.random(0,80),
+				math.random(100,255)
+			)
+			frame.BackgroundTransparency = math.random(0,30)/100
+			txt.TextColor3 = Color3.fromRGB(
+				math.random(180,255),
+				math.random(180,255),
+				math.random(180,255)
+			)
+			task.wait(math.random(3,8)/100)
+		end
+	end)
+
+	-- Тряска гуи
+	task.spawn(function()
+		local t0 = tick()
+		while tick() - t0 < 1.8 do
+			frame.Position = UDim2.new(
+				(math.random()-0.5)*0.05,
+				0,
+				(math.random()-0.5)*0.05,
+				0
+			)
+			task.wait(0.03)
+		end
+		frame.Position = UDim2.new(0,0,0,0)
+	end)
+
+	-- Автоудаление
+	task.delay(1.8, function()
+		pcall(function() snd:Destroy() end)
+		pcall(function() snd2:Destroy() end)
+		pcall(function() sg:Destroy() end)
+		jumpscareActive = false
+	end)
+end
+
+-- Обёртка над запуском морфа: добавляет жуть
+local function executeWithHorror(url)
+	click()
+
+	-- Иногда глитч персонажа ДО запуска
+	if math.random() < 0.5 then
+		task.spawn(function() glitchCharacter(1) end)
+	end
+
+	-- Запускаем морф
+	local ok, err = pcall(function()
+		loadstring(game:HttpGet(url))()
+	end)
+
+	-- Иногда глитч ПОСЛЕ запуска (анимации уже новые, ломаем их)
+	if math.random() < 0.6 then
+		task.spawn(function()
+			task.wait(math.random(3,10)/10)
+			glitchCharacter(1)
+		end)
+	end
+
+	-- Скример с шансом ~20%
+	if math.random() < 0.2 then
+		task.spawn(function()
+			task.wait(math.random(5,20)/10)
+			jumpscare()
+		end)
+	end
+
+	-- Постоянная мелкая тряска персонажа после морфа
+	task.spawn(function()
+		task.wait(math.random(5,15)/10)
+		glitchCharacter(0.5)
+	end)
+end
+
+-- ============================================================
+-- ZALGO строки для UI (прописаны заранее)
+-- ============================================================
+
+local Z = {
+	title     = ".̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚",
+	home      = "H̸̢̛̪̱̮̠̏̋̈́̒͜Ơ̷̢̧̚M̶̢̛̪̱̮̠̏̋̈́̒͜E̷̢̧̛",
+	morphs    = "M̸̢̛̪̱̮̠̏̋̈́̒͜Ơ̷̢̧Ȑ̶̢̛̪̱̮̠̋̈́̒͜P̷̢̧̛H̶̢̛̪̱̮̠̏̋̈́̒͜S̷̢̧̛",
+	misc      = "M̸̢̛̪̱̮̠̏̋̈́̒͜I̷̢̧̛S̶̢̛̪̱̮̠̏̋̈́̒͜C̷̢̧̛",
+	gui       = "G̸̢̛̪̱̮̠̏̋̈́̒͜Ư̷̢̧Ȉ̶̢̛̪̱̮̠̋̈́̒͜",
+	id        = "Ȉ̸̢̛̪̱̮̠̋̈́̒͜D̷̢̧̛:̶̢̛̪̱̮̠̏̋̈́̒͜ ",
+	by        = "B̸̢̛̪̱̮̠̏̋̈́̒͜Y̷̢̧̛ S̶̢̛̪̱̮̠̏̋̈́̒͜E̷̢̧̛C̶̢̛̪̱̮̠̏̋̈́̒͜0̷̢̧̛0̶̢̛̪̱̮̠̏̋̈́̒͜9̷̢̧̛2̶̢̛̪̱̮̠̏̋̈́̒͜5̷̢̧̛",
+	tiktok    = "T̸̢̛̪̱̮̠̏̋̈́̒͜I̷̢̧̛K̶̢̛̪̱̮̠̏̋̈́̒͜T̷̢̧̛Ơ̶̢̪̱̮̠̏̋̈́̒͜K̷̢̧̛:̶̢̛̪̱̮̠̏̋̈́̒͜ S̷̢̧̛Ȅ̶̢̛̪̱̮̠̋̈́̒͜C̷̢̧̛0̶̢̛̪̱̮̠̏̋̈́̒͜0̷̢̧̛9̶̢̛̪̱̮̠̏̋̈́̒͜2̷̢̧̛5̶̢̛̪̱̮̠̏̋̈́̒͜",
+}
+
+-- ============================================================
+-- UI
+-- ============================================================
+
 local top = Instance.new("Frame", main)
 top.Size = UDim2.new(1,0,0,35)
 top.BackgroundColor3 = Color3.fromRGB(30,0,45)
@@ -39,7 +269,7 @@ local title = Instance.new("TextLabel", top)
 title.Size = UDim2.new(1,-50,1,0)
 title.Position = UDim2.new(0,10,0,0)
 title.BackgroundTransparency = 1
-title.Text = ".̸̭̜̪̣̥̤̿̋̏̿̄͑̚͠.̵̤͔̣̖̫̦̜̞̼̲̯̒͗͛.̶̳͒̊̀̎́͂̏͠.̶̛̛̘̚͠.̶̹̝̻͚̬̫͔͛̏͋̔̑͐̑̉͗͑͘͠.̷̼͉̞̗̖͎͇̹̍̅͗͂̓̏͒̕.̶̨̗͚͖̣̥̪͕̽̐̕.̴̭̠̳̘̱̼͖̗͐͌̌͘͠.̸̨̮͓̱̠͖̺̺̻͚̿́̋̋͑̈͊͊̀̊̚͝.̶̺̰̭̼̦͖̻̱̣̀̑̀̏.̸̢̛͙̟̼͇͙͈͑͛͆̓.̷̧̰͚̫͙͍̥̱͍͊̆̔͋̈̐̓͋̃͒̇̚.̶͉̹̗͚̄̆̈́͋͘͝.̷̯̹̻̫͓͉̩̑̈́͊̍͑͆̀͠.̶̡̢̞̖̘̕.̴̩̝͓̰̭̗͍͎̘̺̊͊́͆.̷̧̛͉͓͇̮̥̤̠̣̞̇͋͒̚͜.̷͙͔́̅̿̆̑̉̚͝.̵̛̭̮̼̜͕̀͂͌̀̀̑͒̽̓̚.̶̧͈͕̰̼̩͍̺̜̳̽͗̔̐̀͂̃͑̓͝.̷̺͙̹̼̖̀ͅ.̷̠̅͐͗͑̒̎͑̀͌̈͆́.̸̩͖̯̪̥͑̄͜ͅ.̶̧̨̩̫͎̖͓̬̙͇̓́̐ͅ.̵̹͖̟̘̓͒̿̋͌̔̒͑̈́̓.̵̡͍̦̯̙̖͂̌̈́̀̽͘͜͝.̵͕̠̰̑̀.̶͇̹̠̜̰̪͓͎̱̝͚̟̍̾͛̅͘.̵̧̙̰̖̻͍̤̝͇̎̑͂.̵̪͎͗̽̕.̶̫̭͈͙̀̀̅͘͝͠.̸̡̼̩͕̱̰͉̝͑̾̒͐̄͂̆̈͗͛͆̕.̴̢͚͙̦̿̊̀̕ͅ.̶̛̼͎̣͉̻̲͔͐̈́̐͛̓̈́̾́̕̚ͅ.̸̨̱̥̻͕̦̉̔̓̏͂̊̐̽̊̒̅.̶̨̡̤̠̞̦̙͈̖̰̹̒̄̂̅̉͊̑̀ͅ.̷̡̗̱̻͓͔̭͕͔̀͗͊͋̓̎͜͝ͅ.̶̛̛̝͓̟͛̀͑̅̍̎̔̒͝.̸̢̥̯͔̫̭͔͋̅͜͝.̷̡̡̧̡̪̫̠̯̘̫̤͑́̑́ͅ.̷͍͎̑͑͌͘.̴͓͝.̴̢̢̛͓̀͒̈́͑̒̊͝.̷̦͔͔̲̼̭͇̰͍̝̈́̾̓͊̎̆̋̕͝.̸̢̤̋̃̓̉͗̏̾̃̌̚͘̕.̵̨͓̼͚̮͆͂̍.̴̨̢̩͕̝͚̱̙̹̠̝̀̎̑̕ͅ.̸̡̫̺̜͙̃͌̈͆͝͝.̵̭͕͙̻͍͍̞̗̿͒́͆̎͒͑̈͜.̴̨͎̱͖̤̩͎͚̗̭̖̦͆̆̍̈́.̵̧̘̰̬̫̙̤͔̫̥̱̌͂̔̇̾͊̈́́̒͒̋͜.̷̳͕͓̲̭̺͓͓͆̽͗̌.̸̢͇͈͎͉͓͕̬̲̆͂̓̃̅̑̽̍́̕̚͜͠.̵̧̢̥̥͙͖̻͍̍.̴̜̖̳̌̒̈́̀͐͗́́̔͐̀̓.̴͚̯͕̏.̶̛̰̙̫̼͉̲͍͍̼͕̓́̉̐̈́̊̏̍̕.̵̢̖̘͖̹̪́̈͐̾̍̈́.̵̛͉̞̳͉̪͕̦͖̯̙̼̋͊̈́́̚͠.̵̘̙̍.̴̧͍̟̭̗̫͓̺̼̒.̸̟͎͕͑.̶̨̧̛̻̬̱̻̖͗̔.̸̢̬̰̰͇͔̞́̅̊̎̈́͂͂͗̾̏ͅ.̴̻̳̖̦͇̦̼̣̳̜̝̪͠.̵̨̰̳͍̈́͒͂̾̌͆̄̑̕͝.̵̡̛̯͇͚̰̬̰͊̉͐̾̽̀͜ͅ.̸̢̣̳̩̰̞̰̳̼̉̔͐̔̉̌̐͆͊͝͠.̶̨̣̠͉͈̙̯̤̤̖̖̀̊͑̓́͂̔̇͝͝ͅ.̵̣̱̱̰̈́͆̾̑̍̇͑̈́̊̓̚.̶̨̧̧̪̮͕̮̙̜̄͋̄́͋̈́͒͝.̴̟̉̽̍̅͠.̶̨̡͕̞͚͖͉̘̙̣̫̤͂̅̚.̵̰̼̎̂͌̏.̶̢̤̙̠̺̟͍̌͛̂͒̓͐̒̚.̷̡̹͇̘̺̺̥̱̜̝̉̽͗.̶͓̲̱͇͎̩̻͍͆͐̒͌̀̾̌͛̾̍͋͘.̷̂̄͆̈́̒̀͜.̴̞̖̞̳̾́̉̑̿͋̌́̉̓.̴͙͖̗̘̲̤͖̂̽̒̎.̷̫̩͚͖̬̬̲̹͑̐̕͝.̷̢̡̡̧̭͕̙̬̝̱̭̈́́̋͜.̸̛̬̳͙͔̌̾̈́̔̋͌͂̅͠.̶͇̖̐̈́́̀́͜.̷̗̹̉̋̍͋̀̆͆̓͘͠ͅ.̶̨̩͚̪̠̺͖̬͛̓̒͌͐͌̀̓̐̑́̏.̸̤͉̗̬͙͚͓̭̰̞̝̾̔͑̓̓̔̊̒̈́͘͝.̸͚͒.̷̧͓̲͈̙̱̉͆̿̾̎͐̔͐͜ͅ.̵̨͓̩̺̬̠͇̣̎̍̔̿̆̂̃͠.̸͖̦̻̓͌̆́̄̇̄̾̊̊̃͘.̴̢̡̦͇̹̗̦̲́̈͝.̸͇͓̫̖̜̞̀̋̀͆̓͌̆̈͜͜.̵̬͓͑͛̐̓̈̈́.̴̢̝̣͍̦͚͇̘͉̘͊̋̉̊̋́̍͠.̴̛̹͔̗̣̱̀̄̆̓̔͗͊͋̆.̶̧̮̥͔̹̫͎͒.̷̡̡̜̒̄̃̅͋̀̏̇͊͜.̵̜̜̐̄̏̇̓.̶͕̄̎͐̓̔͘.̶̹̹͐̍.̸̡̥͠.̸̡̧͕͖̫̹̎̓.̷͈̲͍͎̯̮͍̙͉̳̄̏̈́̇̄͊́͜͠͝͝͝.̷̡̝̳͔̯͍̼̦̪͔̠̣̔̀̔̑.̴͔̼͌̇͛̃̂.̶̛͔͈͖̼͉̔́́̽͘͝͠.̶̜̖͈̱͚̠̺̋ͅ.̸̢̡̧̜̘̯̰͎̘̂̈.̴̛̬̟͉̌͌̅̈́̂͌̈́̚͜.̶̠͒̑̃̅̿́͘̚.̵͔̖͕̙̮̈́.̵͈̳̆̽.̴͈̅̇̈́̈́͒́̏̓̊̕.̵̨̮̜̬͓̻̆͑̀́̾́͂̉̔͌̎͆.̴̻̬̜̥̞̺̥̃͊̉̀͠.̴͕͙̘͊̔͜.̷̡̰͚͕̟̔̀͆́̎̕͘ͅͅͅ.̶̢̳͈͇̼͔̘͇̝̯̮̦̉̔͝.̴̨̨̯͖͇͍̃̿͌͋͗̒̚.̶͎̃̃͌̎̔̏̀̄͛̈́͋.̸̧̛̛̳̠̣͕͕͔̦̮̒̈̆̈̈́́̆͆̚͝.̶̘͍̮̥̓.̶̺̐̌͊̂.̷̟̀.̴̧͎̪̥͎̜̜̠̟̓̏̓̑͂̏̏͐͜͠͝.̸̧͕̟̖̳̲̤̝̂̍͗͜͜.̸̧̞̳̹̩̜̟̇̒̏͘ͅ.̶͔̰̯̥͖̰͚̄̌̅.̴̝͍͈̩̘̌͑.̴̱̘̱̹̳͍̮͉͗̊̋̇̏͝͠͝͝.̶̧̢̥̥͈̜̓.̶̹͍̺̰̜̟̰͓̜̱̎͐́.̷̨̩͔̝͕̫̱̞̫̝͂̿.̸̖͖̟̹͍̰̟̲̟̫͑̂͊͐̽̈́̇͠.̶͇̙̎̏͘͝.̸̨̨̯̥̯̳̜̊͒̄͒̄̚͠.̶̲̟͗͠.̴͔̫̦͐̑̑͑̿̔̐̽͝.̶̠͔͚̮̺͙̞̫̙̄̑̀̎ͅͅ.̵̢̡̙̼͓͖̻͖̹̞̯͆́͜.̵̢̹̘͒̎̈̏̓̋̀͗ͅ.̸̡̗͕̭̬̲͙̙̭̩̊̋̋̊͗̋͆̑͊͘͠.̴̻̬̥͚̦̀͊̎͗͒͝ͅ.̷̄͋́͋"
+title.Text = Z.title
 title.TextColor3 = Color3.fromRGB(230,230,230)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 16
@@ -57,7 +287,6 @@ toggleBtn.AutoButtonColor = false
 toggleBtn.BorderSizePixel = 0
 
 local isOpen = true
-
 toggleBtn.MouseButton1Click:Connect(function()
 	click()
 	if isOpen then
@@ -95,10 +324,10 @@ local function tab(text,y)
 	return b
 end
 
-local homeBtn = tab("H̷̛̜̏̾̔ǒ̶̖̙̎̐m̸̟̯̄̆̉é̵̳̺̒̚",5)
-local morphsBtn = tab("M̷̛̜̏̾̔ǒ̶̖̙̎̐r̸̟̯̄̆̉ṕ̵̳̺̒̚ḧ̴̫́̽̿̂s̷̛̜̏̾̔",50)
-local miscBtn = tab("M̶̖̙̌̎̐ī̸̟̯̆̉ś̵̳̺̒̚c̴̫̈́̽̿̂",95)
-local guiBtn = tab("G̷̛̜̏̾̔Ǔ̶̖̙̎̐Ī̸̟̯̆̉",140)
+local homeBtn = tab(Z.home,5)
+local morphsBtn = tab(Z.morphs,50)
+local miscBtn = tab(Z.misc,95)
+local guiBtn = tab(Z.gui,140)
 
 local folder = Instance.new("Folder", pages)
 
@@ -127,11 +356,12 @@ morphsBtn.MouseButton1Click:Connect(function() switch(morphs) end)
 miscBtn.MouseButton1Click:Connect(function() switch(misc) end)
 guiBtn.MouseButton1Click:Connect(function() switch(guiPage) end)
 
+-- HOME
 local name = Instance.new("TextLabel", home)
 name.Size = UDim2.new(1,-20,0,25)
 name.Position = UDim2.new(0,10,0,10)
 name.BackgroundTransparency = 1
-name.Text = player.Name
+name.Text = zalgo(player.Name)
 name.TextSize = 14
 name.TextColor3 = Color3.fromRGB(230,230,230)
 name.Font = Enum.Font.GothamBold
@@ -141,7 +371,7 @@ local id = Instance.new("TextLabel", home)
 id.Size = UDim2.new(1,-20,0,20)
 id.Position = UDim2.new(0,10,0,35)
 id.BackgroundTransparency = 1
-id.Text = "Ȉ̷̛̜̾̔Ď̶̖̙̎̐:̸̟̯̄̆̉ "..player.UserId
+id.Text = Z.id .. player.UserId
 id.TextSize = 13
 id.TextColor3 = Color3.fromRGB(180,180,180)
 id.Font = Enum.Font.Gotham
@@ -151,7 +381,7 @@ local credit = Instance.new("TextLabel", home)
 credit.Size = UDim2.new(1,-10,0,20)
 credit.Position = UDim2.new(0,5,1,-44)
 credit.BackgroundTransparency = 1
-credit.Text = "b̷̛̜̏̾̔y̶̖̙̌̎̐ S̸̟̯̄̆̉é̵̳̺̒̚c̴̫̈́̽̿̂0̷̛̜̏̾̔0̶̖̙̌̎̐9̸̟̯̄̆̉2̵̳̺́̒̚5̴̫̈́̽̿̂"
+credit.Text = Z.by
 credit.TextSize = 12
 credit.TextColor3 = Color3.fromRGB(120,120,120)
 credit.Font = Enum.Font.Gotham
@@ -160,11 +390,12 @@ local tiktok = Instance.new("TextLabel", home)
 tiktok.Size = UDim2.new(1,-10,0,20)
 tiktok.Position = UDim2.new(0,5,1,-22)
 tiktok.BackgroundTransparency = 1
-tiktok.Text = "M̷̛̜̏̾̔ě̶̖̙̎̐ ō̸̟̯̆̉ń̵̳̺̒̚ T̴̫̈́̽̿̂ȉ̷̛̜̾̔ǩ̶̖̙̎̐T̸̟̯̄̆̉ó̵̳̺̒̚k̴̫̈́̽̿̂:̷̛̜̏̾̔ Š̶̖̙̎̐ē̸̟̯̆̉ć̵̳̺̒̚0̴̫̈́̽̿̂0̷̛̜̏̾̔9̶̖̙̌̎̐2̸̟̯̄̆̉5̵̳̺́̒̚s̴̫̈́̽̿̂c̷̛̜̏̾̔ř̶̖̙̎̐ī̸̟̯̆̉ṕ̵̳̺̒̚ẗ̴̫́̽̿̂"
+tiktok.Text = Z.tiktok
 tiktok.TextSize = 12
 tiktok.TextColor3 = Color3.fromRGB(180,120,220)
 tiktok.Font = Enum.Font.Gotham
 
+-- MORPHS
 local morphsContainer = Instance.new("Frame", morphs)
 morphsContainer.Size = UDim2.new(1,-20,1,-20)
 morphsContainer.Position = UDim2.new(0,10,0,10)
@@ -174,7 +405,7 @@ morphsContainer.ClipsDescendants = true
 local morphsLabel = Instance.new("TextLabel", morphsContainer)
 morphsLabel.Size = UDim2.new(1,0,0,30)
 morphsLabel.BackgroundTransparency = 1
-morphsLabel.Text = "M̷̛̜̏̾̔ǒ̶̖̙̎̐r̸̟̯̄̆̉ṕ̵̳̺̒̚ḧ̴̫́̽̿̂s̷̛̜̏̾̔"
+morphsLabel.Text = Z.morphs
 morphsLabel.TextColor3 = Color3.fromRGB(255,255,255)
 morphsLabel.Font = Enum.Font.GothamBold
 morphsLabel.TextSize = 16
@@ -200,10 +431,10 @@ local function addMorphButton(name, url)
 	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 	btn.TextColor3 = Color3.fromRGB(230,230,230)
 	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 13
+	btn.TextSize = 12
+	-- ТЕПЕРЬ ИСПОЛЬЗУЕМ executeWithHorror вместо обычного loadstring
 	btn.MouseButton1Click:Connect(function()
-		click()
-		loadstring(game:HttpGet(url))()
+		executeWithHorror(url)
 	end)
 end
 
@@ -271,8 +502,8 @@ addMorphButton("Ḱ̵̳̺̒̚ḯ̴̫̽̿̂t̷̛̜̏̾̔č̶̖̙̎̐h̸̟̄̆̉�
 addMorphButton("R̴̫̈́̽̿̂ȅ̷̛̜̾̔ď̶̖̙̎̐ S̸̟̯̄̆̉í̵̳̺̒̚n̴̫̈́̽̿̂ d̷̛̜̏̾̔ř̶̖̙̎̐ā̸̟̯̆̉ǵ̵̳̺̒̚ö̴̫́̽̿̂n̷̛̜̏̾̔", "https://raw.githubusercontent.com/nicolasbarbosa323/sin-dragon/refs/heads/main/Fe_sin_dragon_music_customizado_final.lua")
 addMorphButton("G̷̛̜̏̾̔ǎ̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ ȟ̶̖̙̎̐ā̸̟̯̆̉ń̵̳̺̒̚d̴̫̈́̽̿̂s̷̛̜̏̾̔", "https://raw.githubusercontent.com/nicolasbarbosa323/good-cop-bad-coop/refs/heads/main/GasterHands.txt")
 addMorphButton("Ǧ̶̖̙̎̐ā̸̟̯̆̉ĺ̵̳̺̒̚ä̴̫́̽̿̂x̷̛̜̏̾̔y̶̖̙̌̎̐ b̸̟̯̄̆̉á̵̳̺̒̚n̴̫̈́̽̿̂ȉ̷̛̜̾̔š̶̖̙̎̐h̸̟̯̄̆̉é̵̳̺̒̚r̴̫̈́̽̿̂ g̷̛̜̏̾̔ǔ̶̖̙̎̐n̸̟̯̄̆̉", "https://raw.githubusercontent.com/sharipovdaniyal81-hash/Galaxy-banisher-gun/refs/heads/main/Galaxy%20banisher")
-addMorphButton("J̸̟̯̄̆̉ó̵̳̺̒̚ḧ̴̫́̽̿̂n̷̛̜̏̾̔ Ď̶̖̙̎̐ō̸̟̯̆̉é̵̳̺̒̚ (̴̫̈́̽̿̂Ȑ̷̛̜̾̔ě̶̖̙̎̐m̸̟̯̄̆̉á̵̳̺̒̚k̴̫̈́̽̿̂ȅ̷̛̜̾̔)̶̖̙̌̎̐", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
-addMorphButton("X̷̛̜̏̾̔ě̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ (̶̖̙̌̎̐R̸̟̯̄̆̉é̵̳̺̒̚m̴̫̈́̽̿̂ȁ̷̛̜̾̔ǩ̶̖̙̎̐ē̸̟̯̆̉)̵̳̺́̒̚", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
+addMorphButton("J̸̟̯̄̆̉ó̵̳̺̒̚ḧ̴̫́̽̿̂n̷̛̜̏̾̔ Ď̶̖̙̎̐ō̸̟̯̆̉é̵̳̺̒̚ R̴̫̈́̽̿̂ȅ̷̛̜̾̔m̶̖̙̌̎̐ā̸̟̯̆̉ḱ̵̳̺̒̚ë̴̫́̽̿̂", "https://raw.githubusercontent.com/nicolasbarbosa323/john-doe/refs/heads/main/john%20doe%20completed.lua")
+addMorphButton("X̷̛̜̏̾̔ě̶̖̙̎̐s̸̟̯̄̆̉t̵̳̺́̒̚ë̴̫́̽̿̂ȑ̷̛̜̾̔ Ř̶̖̙̎̐ē̸̟̯̆̉ḿ̵̳̺̒̚ä̴̫́̽̿̂k̷̛̜̏̾̔ě̶̖̙̎̐", "https://raw.githubusercontent.com/nicolasbarbosa323/xester/refs/heads/main/qC7MUFRJ.txt")
 
 local hacklordBtn = Instance.new("TextButton", morphsScroll)
 hacklordBtn.Size = UDim2.new(1,0,1,0)
@@ -280,12 +511,12 @@ hacklordBtn.Text = "H̷̛̜̏̾̔ǎ̶̖̙̎̐c̸̟̯̄̆̉ḱ̵̳̺̒̚l̴̈́̽�
 hacklordBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 hacklordBtn.TextColor3 = Color3.fromRGB(230,230,230)
 hacklordBtn.Font = Enum.Font.Gotham
-hacklordBtn.TextSize = 13
+hacklordBtn.TextSize = 12
 hacklordBtn.MouseButton1Click:Connect(function()
-	click()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/sharipovdaniyal81-hash/Hacklord/refs/heads/main/Hacklord"))()
+	executeWithHorror("https://raw.githubusercontent.com/sharipovdaniyal81-hash/Hacklord/refs/heads/main/Hacklord")
 end)
 
+-- MISC
 local miscContainer = Instance.new("Frame", misc)
 miscContainer.Size = UDim2.new(1,-20,1,-20)
 miscContainer.Position = UDim2.new(0,10,0,10)
@@ -295,7 +526,7 @@ miscContainer.ClipsDescendants = true
 local miscLabel = Instance.new("TextLabel", miscContainer)
 miscLabel.Size = UDim2.new(1,0,0,30)
 miscLabel.BackgroundTransparency = 1
-miscLabel.Text = "M̶̖̙̌̎̐ī̸̟̯̆̉ś̵̳̺̒̚c̴̫̈́̽̿̂"
+miscLabel.Text = Z.misc
 miscLabel.TextColor3 = Color3.fromRGB(255,255,255)
 miscLabel.Font = Enum.Font.GothamBold
 miscLabel.TextSize = 16
@@ -321,16 +552,16 @@ local function addMiscButton(name, url)
 	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 	btn.TextColor3 = Color3.fromRGB(230,230,230)
 	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 13
+	btn.TextSize = 12
 	btn.MouseButton1Click:Connect(function()
-		click()
-		loadstring(game:HttpGet(url))()
+		executeWithHorror(url)
 	end)
 end
 
 addMiscButton("K̷̛̜̏̾̔ě̶̖̙̎̐ȳ̸̟̯̆̉b̵̳̺́̒̚ö̴̫́̽̿̂ȁ̷̛̜̾̔ř̶̖̙̎̐d̸̟̯̄̆̉", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
 addMiscButton("Ŕ̵̳̺̒̚6̴̫̈́̽̿̂", "https://raw.githubusercontent.com/LeathalMurd/Roblox-R15-To-R6/refs/heads/main/Converter.lua")
 
+-- GUI
 local guiContainer = Instance.new("Frame", guiPage)
 guiContainer.Size = UDim2.new(1,-20,1,-20)
 guiContainer.Position = UDim2.new(0,10,0,10)
@@ -340,7 +571,7 @@ guiContainer.ClipsDescendants = true
 local guiLabel = Instance.new("TextLabel", guiContainer)
 guiLabel.Size = UDim2.new(1,0,0,30)
 guiLabel.BackgroundTransparency = 1
-guiLabel.Text = "G̷̛̜̏̾̔Ǔ̶̖̙̎̐Ī̸̟̯̆̉"
+guiLabel.Text = Z.gui
 guiLabel.TextColor3 = Color3.fromRGB(255,255,255)
 guiLabel.Font = Enum.Font.GothamBold
 guiLabel.TextSize = 16
@@ -366,16 +597,32 @@ local function addGuiButton(name, url)
 	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
 	btn.TextColor3 = Color3.fromRGB(230,230,230)
 	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 13
+	btn.TextSize = 12
 	btn.MouseButton1Click:Connect(function()
-		click()
-		loadstring(game:HttpGet(url))()
+		executeWithHorror(url)
 	end)
 end
 
 addGuiButton("F̷̛̜̏̾̔ľ̶̖̙̎̐ȳ̸̟̯̆̉ Ǵ̵̳̺̒̚Ǘ̴̫̽̿̂Ȉ̷̛̜̾̔", "https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui")
 addGuiButton("N̸̟̯̄̆̉Ṕ̵̳̺̒̚S̴̫̈́̽̿̂ S̷̛̜̏̾̔p̶̖̙̌̎̐ā̸̟̯̆̉ẃ̵̳̺̒̚n̴̫̈́̽̿̂ȅ̷̛̜̾̔ř̶̖̙̎̐", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
 
+-- ============================================================
+-- ФОНОВЫЕ ЭФФЕКТЫ: случайные глитчи и скримеры
+-- ============================================================
+
+task.spawn(function()
+	while true do
+		task.wait(math.random(30, 90)) -- каждые 30-90 сек
+		if math.random() < 0.5 then
+			glitchCharacter(0.7)
+		end
+		if math.random() < 0.15 then
+			jumpscare()
+		end
+	end
+end)
+
+-- Переливание фона хаба (как раньше)
 local function tweenColor(object, color1, color2, duration)
 	while true do
 		TweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear), {BackgroundColor3 = color2}):Play()
@@ -385,23 +632,13 @@ local function tweenColor(object, color1, color2, duration)
 	end
 end
 
-local darkPurple = Color3.fromRGB(40,0,60)
-local lightPurple = Color3.fromRGB(80,20,120)
-local darkSide = Color3.fromRGB(25,0,40)
-local lightSide = Color3.fromRGB(60,15,90)
-
-local duration = 6.67
-
-task.spawn(function() tweenColor(main, darkPurple, lightPurple, duration) end)
-task.spawn(function() tweenColor(sidebar, darkSide, lightSide, duration) end)
-
-local strokeColor1 = Color3.fromRGB(150,50,200)
-local strokeColor2 = Color3.fromRGB(200,100,255)
+task.spawn(function() tweenColor(main, Color3.fromRGB(40,0,60), Color3.fromRGB(80,20,120), 6.67) end)
+task.spawn(function() tweenColor(sidebar, Color3.fromRGB(25,0,40), Color3.fromRGB(60,15,90), 6.67) end)
 task.spawn(function()
 	while true do
-		TweenService:Create(stroke, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Color = strokeColor2}):Play()
-		task.wait(duration)
-		TweenService:Create(stroke, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Color = strokeColor1}):Play()
-		task.wait(duration)
+		TweenService:Create(stroke, TweenInfo.new(6.67, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(200,100,255)}):Play()
+		task.wait(6.67)
+		TweenService:Create(stroke, TweenInfo.new(6.67, Enum.EasingStyle.Linear), {Color = Color3.fromRGB(150,50,200)}):Play()
+		task.wait(6.67)
 	end
 end)
