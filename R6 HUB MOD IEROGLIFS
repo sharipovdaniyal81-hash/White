@@ -35,16 +35,18 @@ local function click()
 end
 
 -- ============================================================
--- ГЛОБАЛЬНЫЕ ФЛАГИ
+-- ТАЙМИНГИ
 -- ============================================================
 local SESSION_START = tick()
-local GLITCH_START_AT = 5        -- глитчи начинаются рано
-local FIRST_JUMPSCARE_AT  = 12   -- 1-й скример на 12-й секунде
-local SECOND_JUMPSCARE_AT = 27   -- 2-й скример на 27-й секунде (через 15 сек)
-local JUMPSCARE_INTERVAL  = 60   -- 3-й и дальше — каждую минуту
+local GLITCH_START_AT     = 5
+local FIRST_JUMPSCARE_AT  = 12
+local SECOND_JUMPSCARE_AT = 27
+local JUMPSCARE_INTERVAL  = 60
+local JUMPSCARE_DURATION  = 2   -- ⭐ короче (было 3)
 
 local postJumpscare   = false
 local jumpscareFired  = false
+local firstJumpscareDone = false  -- ⭐ флаг для чёрной панели
 
 -- ============================================================
 -- ПОРЧА ТЕКСТА
@@ -209,8 +211,20 @@ local CREEPY_MESH_IDS = {
 	"rbxassetid://12226377",
 }
 
+-- ⭐ Рандомная "замена цвета" — зелёный на красный, любой на чёрный и т.д.
+local function randomReplaceColor(origColor)
+	-- 30% — чёрный (обесцвечивание)
+	if math.random() < 0.3 then return Color3.fromRGB(0,0,0) end
+	-- 20% — красный
+	if math.random() < 0.5 then return Color3.fromRGB(200,0,0) end
+	-- 15% — тёмно-фиолетовый
+	if math.random() < 0.65 then return Color3.fromRGB(30,0,50) end
+	-- остальное — любой жуткий
+	return CREEPY_COLORS[math.random(1, #CREEPY_COLORS)]
+end
+
 local function corruptCharacterVisuals(duration, meshReplace)
-	duration = duration or 3
+	duration = duration or 2
 	local char = player.Character
 	if not char then return end
 	local t0 = tick()
@@ -238,55 +252,203 @@ local function corruptCharacterVisuals(duration, meshReplace)
 			for _, obj in ipairs(char:GetDescendants()) do
 				if obj:IsA("BasePart") then
 					pcall(function()
-						if math.random() < 0.35 then
-							obj.Color = CREEPY_COLORS[math.random(1, #CREEPY_COLORS)]
+						-- ⭐ чаще меняем цвета (было 0.35)
+						if math.random() < 0.5 then
+							obj.Color = randomReplaceColor(obj.Color)
 						end
-						if math.random() < 0.3 then
+						if math.random() < 0.35 then
 							obj.Material = CREEPY_MATERIALS[math.random(1, #CREEPY_MATERIALS)]
 						end
-						if math.random() < 0.25 then
-							obj.Transparency = math.random() * 0.4
+						if math.random() < 0.3 then
+							obj.Transparency = math.random() * 0.5
 						end
-						if math.random() < 0.15 then
-							obj.Size = obj.Size * (0.85 + math.random() * 0.3)
+						if math.random() < 0.2 then
+							obj.Size = obj.Size * (0.8 + math.random() * 0.4)
 						end
 					end)
 				elseif obj:IsA("SpecialMesh") then
 					pcall(function()
-						if math.random() < 0.35 then
+						if math.random() < 0.4 then
 							obj.Scale = obj.Scale * Vector3.new(
-								0.6 + math.random() * 0.8,
-								0.6 + math.random() * 1.2,
-								0.6 + math.random() * 0.8
+								0.5 + math.random() * 1.0,
+								0.5 + math.random() * 1.5,
+								0.5 + math.random() * 1.0
 							)
 						end
-						if math.random() < 0.25 then
+						if math.random() < 0.3 then
 							obj.Offset = Vector3.new(
-								(math.random()-0.5)*0.6,
-								(math.random()-0.5)*0.6,
-								(math.random()-0.5)*0.6
+								(math.random()-0.5)*0.8,
+								(math.random()-0.5)*0.8,
+								(math.random()-0.5)*0.8
 							)
 						end
-						if meshReplace and math.random() < 0.15 then
+						if meshReplace and math.random() < 0.2 then
 							obj.MeshId = CREEPY_MESH_IDS[math.random(1, #CREEPY_MESH_IDS)]
 						end
 					end)
 				end
 			end
-			task.wait(0.08)
+			task.wait(0.07)
 		end
 
 		for obj, data in pairs(saved) do
 			pcall(function()
 				if obj and obj.Parent then
-					for k, v in pairs(data) do
-						obj[k] = v
+					for k, v in pairs(data) do obj[k] = v end
+				end
+			end)
+		end
+	end)
+end
+
+-- ============================================================
+-- ⭐ ПОСТОЯННАЯ ПОРЧА НОВЫХ ОБЪЕКТОВ
+-- Работает даже если скрипт загружает объект по assetId
+-- ============================================================
+local worldCorruptionActive = false
+
+local function isPartOfMe(obj)
+	local char = player.Character
+	if not char then return false end
+	return obj:IsDescendantOf(char)
+end
+
+-- Следим за новыми частями в workspace
+workspace.DescendantAdded:Connect(function(obj)
+	if not worldCorruptionActive then return end
+	if not obj:IsA("BasePart") then return end
+	if isPartOfMe(obj) then return end
+
+	-- Первое изменение сразу
+	task.wait(0.05)
+	pcall(function()
+		if obj and obj.Parent then
+			if math.random() < 0.7 then
+				obj.Color = randomReplaceColor(obj.Color)
+			end
+			if math.random() < 0.5 then
+				obj.Material = CREEPY_MATERIALS[math.random(1, #CREEPY_MATERIALS)]
+			end
+			if math.random() < 0.4 then
+				obj.Transparency = math.random() * 0.5
+			end
+		end
+	end)
+
+	-- Продолжаем дёргать его ещё 3 сек (цвет циклически меняется)
+	task.spawn(function()
+		local t0 = tick()
+		while tick() - t0 < 3 do
+			if not obj or not obj.Parent then break end
+			pcall(function()
+				if math.random() < 0.6 then
+					obj.Color = randomReplaceColor(obj.Color)
+				end
+				if math.random() < 0.3 then
+					obj.Material = CREEPY_MATERIALS[math.random(1, #CREEPY_MATERIALS)]
+				end
+			end)
+			task.wait(0.15)
+		end
+	end)
+end)
+
+-- Следим за новыми частями в персонаже (для скриптов, которые создают меши)
+player.CharacterAdded:Connect(function(char)
+	task.wait(0.5)
+	-- Если мы уже после скримера — портим всё что появится
+	if postJumpscare then
+		for _, obj in ipairs(char:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				pcall(function()
+					obj.Color = randomReplaceColor(obj.Color)
+				end)
+			end
+		end
+	end
+end)
+
+-- ============================================================
+-- ⭐ ПОРЧА ОВЕРХЕД-ТЕКСТА НАД ПЕРСОНАЖЕМ (BillboardGui, Highlight)
+-- ============================================================
+local ZALGO_SHORT = { "̸̷̶̵̴", "̶̸̷̵̳", "̴̸̷̵̶", "̵̶̷̸̳", "̸̿̋̚", "̶̷̸̵̳" }
+local function corruptShort(text)
+	local out = ""
+	for i = 1, #text do
+		local c = text:sub(i, i)
+		out = out .. c
+		if c ~= " " then
+			out = out .. ZALGO_SHORT[math.random(1, #ZALGO_SHORT)]
+			if math.random() < 0.5 then
+				out = out .. ZALGO_SHORT[math.random(1, #ZALGO_SHORT)]
+			end
+		end
+	end
+	return out
+end
+
+-- Ищет BillboardGui/SurfaceGui/Highlight и искажает текст
+local function corruptOverhead(targetChar, level)
+	level = level or 0.8
+	for _, obj in ipairs(targetChar:GetDescendants()) do
+		if obj:IsA("BillboardGui") or obj:IsA("SurfaceGui") then
+			for _, desc in ipairs(obj:GetDescendants()) do
+				if desc:IsA("TextLabel") or desc:IsA("TextButton") or desc:IsA("TextBox") then
+					if not desc:GetAttribute("_origText") then
+						desc:SetAttribute("_origText", desc.Text)
+					end
+					local orig = desc:GetAttribute("_origText")
+					if orig and orig ~= "" then
+						pcall(function()
+							desc.Text = corruptText(orig, level)
+						end)
+					end
+				end
+			end
+		elseif obj:IsA("Highlight") then
+			pcall(function()
+				obj.FillColor = randomReplaceColor(obj.FillColor)
+				obj.OutlineColor = randomReplaceColor(obj.OutlineColor)
+			end)
+		end
+	end
+end
+
+-- Следим за новыми оверхед-объектами у ВСЕХ игроков
+local function trackOverhead(targetChar)
+	targetChar.DescendantAdded:Connect(function(obj)
+		if obj:IsA("BillboardGui") or obj:IsA("SurfaceGui") or obj:IsA("Highlight") then
+			task.wait(0.1)
+			pcall(function()
+				corruptOverhead(targetChar, postJumpscare and 1.0 or 0.6)
+			end)
+
+			-- И продолжаем коверкать периодически
+			task.spawn(function()
+				for i = 1, 15 do
+					task.wait(0.4)
+					if obj and obj.Parent then
+						pcall(function()
+							corruptOverhead(targetChar, postJumpscare and 1.0 or 0.6)
+						end)
+					else
+						break
 					end
 				end
 			end)
 		end
 	end)
 end
+
+-- Подключаем ко всем существующим игрокам
+for _, p in ipairs(game.Players:GetPlayers()) do
+	if p.Character then trackOverhead(p.Character) end
+	p.CharacterAdded:Connect(trackOverhead)
+end
+
+game.Players.PlayerAdded:Connect(function(p)
+	p.CharacterAdded:Connect(trackOverhead)
+end)
 
 -- ============================================================
 -- ПЕРЕХВАТ НОВЫХ GUI ОТ МОРФОВ
@@ -320,7 +482,7 @@ player.PlayerGui.ChildAdded:Connect(function(child)
 		for i = 1, 40 do
 			task.wait(0.3)
 			if child and child.Parent then
-				corruptGuiText(child, postJumpscare and 0.9 or 0.35)
+				corruptGuiText(child, postJumpscare and 1.0 or 0.35)
 			else
 				break
 			end
@@ -336,7 +498,7 @@ player.PlayerGui.ChildAdded:Connect(function(child)
 			pcall(function()
 				local o = desc:GetAttribute("_origText")
 				if o and o ~= "" then
-					desc.Text = corruptText(o, postJumpscare and 0.9 or 0.35)
+					desc.Text = corruptText(o, postJumpscare and 1.0 or 0.35)
 				end
 			end)
 		end
@@ -344,21 +506,8 @@ player.PlayerGui.ChildAdded:Connect(function(child)
 end)
 
 -- ============================================================
--- ГЛИТЧ МИРА (ники)
+-- ГЛИТЧ МИРА (ники + части)
 -- ============================================================
-local ZALGO_SHORT = { "̸̷̶̵̴", "̶̸̷̵̳", "̴̸̷̵̶", "̵̶̷̸̳", "̸̿̋̚" }
-local function corruptShort(text)
-	local out = ""
-	for i = 1, #text do
-		local c = text:sub(i, i)
-		out = out .. c
-		if c ~= " " then
-			out = out .. ZALGO_SHORT[math.random(1, #ZALGO_SHORT)]
-		end
-	end
-	return out
-end
-
 local savedNames = {}
 local savedParts  = {}
 
@@ -402,6 +551,7 @@ local function glitchGameWorld(duration)
 				pcall(function()
 					local orig = savedNames[entry.player] or entry.player.Name
 					entry.hum.DisplayName = corruptShort(orig)
+					corruptOverhead(entry.player.Character, 0.9)
 				end)
 			end
 
@@ -412,10 +562,10 @@ local function glitchGameWorld(duration)
 						if math.random() < 0.5 then
 							p.Transparency = math.random() * 0.7
 						end
-						if math.random() < 0.4 then
-							p.Color = CREEPY_COLORS[math.random(1, #CREEPY_COLORS)]
+						if math.random() < 0.5 then
+							p.Color = randomReplaceColor(p.Color)
 						end
-						if math.random() < 0.2 then
+						if math.random() < 0.25 then
 							p.Material = Enum.Material.Neon
 						end
 					end)
@@ -504,7 +654,57 @@ local function restoreRobloxUI()
 end
 
 -- ============================================================
--- СКРИМЕР
+-- ⭐ ЖУТКИЙ ЗВУК ПОСЛЕ СКРИМЕРА (5 сек)
+-- ============================================================
+local function playCreepyAfterSound()
+	local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	sg.Name = "CREEPY_"..tick()
+	sg.IgnoreGuiInset = true
+	sg.DisplayOrder = 999
+	sg.ResetOnSpawn = false
+
+	-- Три звука с разными мрачными тонами, переливающимися через pitch
+	local sounds = {}
+	local ids = {
+		"rbxassetid://1837879082",   -- тёмный ambient
+		"rbxassetid://6295788800",   -- glitch drone
+		"rbxassetid://131237241",    -- высокий писк
+	}
+	for i, id in ipairs(ids) do
+		local s = Instance.new("Sound", sg)
+		s.SoundId = id
+		s.Volume = 4 - i*0.5
+		s.Looped = true
+		s.PlaybackSpeed = 0.6 + i*0.3
+		s.PlayOnRemove = true
+		s:Play()
+		table.insert(sounds, s)
+	end
+
+	-- Переливание тонов 5 сек
+	task.spawn(function()
+		local t0 = tick()
+		while tick() - t0 < 5 do
+			for _, s in ipairs(sounds) do
+				pcall(function()
+					s.PlaybackSpeed = 0.4 + math.random() * 1.8
+					s.Volume = 2 + math.random() * 3
+				end)
+			end
+			task.wait(0.12)
+		end
+	end)
+
+	task.delay(5, function()
+		for _, s in ipairs(sounds) do
+			pcall(function() s:Destroy() end)
+		end
+		pcall(function() sg:Destroy() end)
+	end)
+end
+
+-- ============================================================
+-- СКРИМЕР (2 сек)
 -- ============================================================
 local jumpscareBusy = false
 local function jumpscare()
@@ -527,7 +727,7 @@ local function jumpscare()
 	local face = Instance.new("TextLabel", frame)
 	face.Size = UDim2.new(1,0,1,0)
 	face.BackgroundTransparency = 1
-	face.Text = corruptText("WAKE UP\nYOU ARE HACKED\nWAKE UP\nDON'T LOOK AWAY", 1)
+	face.Text = corruptText("WAKE UP\nYOU ARE HACKED\nDON'T LOOK AWAY", 1)
 	face.TextColor3 = Color3.fromRGB(0,0,0)
 	face.Font = Enum.Font.GothamBlack
 	face.TextScaled = true
@@ -537,7 +737,7 @@ local function jumpscare()
 	local face2 = Instance.new("TextLabel", frame)
 	face2.Size = UDim2.new(1,0,1,0)
 	face2.BackgroundTransparency = 1
-	face2.Text = corruptText("WAKE UP\nYOU ARE HACKED\nWAKE UP\nDON'T LOOK AWAY", 1)
+	face2.Text = corruptText("WAKE UP\nYOU ARE HACKED\nDON'T LOOK AWAY", 1)
 	face2.TextColor3 = Color3.fromRGB(255,0,0)
 	face2.Font = Enum.Font.GothamBlack
 	face2.TextScaled = true
@@ -563,7 +763,7 @@ local function jumpscare()
 
 	task.spawn(function()
 		local t0 = tick()
-		while tick() - t0 < 3 do
+		while tick() - t0 < JUMPSCARE_DURATION do
 			local r = math.random()
 			if r < 0.4 then
 				frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
@@ -578,24 +778,59 @@ local function jumpscare()
 
 	task.spawn(function()
 		local t0 = tick()
-		while tick() - t0 < 3 do
+		while tick() - t0 < JUMPSCARE_DURATION do
 			face.Position = UDim2.new((math.random()-0.5)*0.04, 0, (math.random()-0.5)*0.04, 0)
 			face2.Position = UDim2.new(0.005+(math.random()-0.5)*0.04, 0, 0.005+(math.random()-0.5)*0.04, 0)
 			task.wait(0.025)
 		end
 	end)
 
-	cameraShake(3.5, 3)
-	characterLag(1.5)
-	task.spawn(function() corruptCharacterVisuals(3, true) end)
-	task.spawn(function() glitchGameWorld(3) end)
+	cameraShake(3.5, JUMPSCARE_DURATION)
+	characterLag(1.2)
+	task.spawn(function() corruptCharacterVisuals(JUMPSCARE_DURATION, true) end)
+	task.spawn(function() glitchGameWorld(JUMPSCARE_DURATION) end)
 
-	task.delay(3, function()
+	task.delay(JUMPSCARE_DURATION, function()
 		pcall(function() snd:Destroy() end)
 		pcall(function() snd2:Destroy() end)
 		pcall(function() sg:Destroy() end)
 		restoreRobloxUI()
 		jumpscareBusy = false
+
+		-- ⭐ ПОСЛЕ СКРИМЕРА — запускаем 5-секундный жуткий переливающийся звук
+		task.spawn(playCreepyAfterSound)
+
+		-- ⭐ После 1-го скримера — панель становится ЧЁРНОЙ
+		if not firstJumpscareDone then
+			firstJumpscareDone = true
+			task.spawn(function()
+				-- Плавно темнеем к чёрному за 0.5 сек
+				for i = 1, 10 do
+					local t = i / 10
+					pcall(function()
+						main.BackgroundColor3 = Color3.fromRGB(
+							math.floor(40 * (1-t)),
+							math.floor(0 * (1-t)),
+							math.floor(60 * (1-t))
+						)
+						sidebar.BackgroundColor3 = Color3.fromRGB(
+							math.floor(25 * (1-t)),
+							0,
+							math.floor(40 * (1-t))
+						)
+						stroke.Color = Color3.fromRGB(
+							math.floor(150 * (1-t)),
+							math.floor(50 * (1-t)),
+							math.floor(200 * (1-t))
+						)
+					end)
+					task.wait(0.05)
+				end
+				main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+				sidebar.BackgroundColor3 = Color3.fromRGB(5,0,5)
+				stroke.Color = Color3.fromRGB(40,0,60)
+			end)
+		end
 	end)
 end
 
@@ -1026,12 +1261,14 @@ addGuiButton("Fly GUI", "https://raw.githubusercontent.com/makkurokurosukescript
 addGuiButton("NPS Spawner", "https://rawscripts.net/raw/Universal-Script-NPC-S*er-201877")
 
 -- ============================================================
--- ПЕРЕЛИВАНИЕ ФОНА
+-- ПЕРЕЛИВАНИЕ ФОНА (только пока не первый скример)
 -- ============================================================
 local function tweenColor(object, color1, color2, duration)
 	while true do
+		if firstJumpscareDone then return end
 		TweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear), {BackgroundColor3 = color2}):Play()
 		task.wait(duration)
+		if firstJumpscareDone then return end
 		TweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear), {BackgroundColor3 = color1}):Play()
 		task.wait(duration)
 	end
@@ -1069,29 +1306,31 @@ task.spawn(function()
 end)
 
 -- ============================================================
--- ⭐ СКРИМЕРЫ ПО РАСПИСАНИЮ
+-- СКРИМЕРЫ ПО РАСПИСАНИЮ
 -- ============================================================
--- 1-й: 12 сек
--- 2-й: 27 сек (12+15)
--- 3-й: 87 сек (27+60)
--- 4-й: 147 сек (87+60) и так далее...
 task.spawn(function()
-	-- Ждём первый скример
 	while tick() - SESSION_START < FIRST_JUMPSCARE_AT do task.wait(0.3) end
 
 	jumpscareFired = true
 	jumpscare()
 
-	-- Через 3 сек после первого скримера включаем рулетку
-	task.wait(3)
+	task.wait(JUMPSCARE_DURATION + 0.2)
 	postJumpscare = true
+	-- ⭐ Включаем ПОСТОЯННУЮ порчу всех новых объектов
+	worldCorruptionActive = true
 
-	-- Вечная поддержка порчи после скримера
+	-- Вечная поддержка порчи персонажа
 	task.spawn(function()
 		while true do
-			task.wait(math.random(10, 20))
+			task.wait(math.random(8, 15))
 			if player.Character then
 				corruptCharacterVisuals(1.5, math.random() < 0.5)
+			end
+			-- Постоянно искажаем оверхед всех игроков
+			for _, p in ipairs(game.Players:GetPlayers()) do
+				if p.Character then
+					pcall(function() corruptOverhead(p.Character, 0.9) end)
+				end
 			end
 		end
 	end)
