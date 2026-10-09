@@ -1,0 +1,1216 @@
+local CoreGui = game:GetService("CoreGui")
+
+if CoreGui:FindFirstChild("JustGui") then
+    CoreGui:FindFirstChild("JustGui"):Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JustGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = CoreGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 200, 0, 160)
+Main.Position = UDim2.new(0.5, -100, 0.5, -80)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Main
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(160, 100, 255)
+UIStroke.Thickness = 2
+UIStroke.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(30, 20, 50)
+Title.BorderSizePixel = 0
+Title.Text = "Just gui"
+Title.TextColor3 = Color3.fromRGB(200, 160, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 15
+Title.Parent = Main
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 10)
+TitleCorner.Parent = Title
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+CloseBtn.Position = UDim2.new(1, -28, 0, 3)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 12
+CloseBtn.BorderSizePixel = 0
+CloseBtn.Parent = Title
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Кнопка ZOMBIE
+local ZombieBtn = Instance.new("TextButton")
+ZombieBtn.Size = UDim2.new(1, -30, 0, 45)
+ZombieBtn.Position = UDim2.new(0, 15, 0, 38)
+ZombieBtn.BackgroundColor3 = Color3.fromRGB(40, 130, 40)
+ZombieBtn.Text = "ZOMBIE"
+ZombieBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ZombieBtn.Font = Enum.Font.GothamBold
+ZombieBtn.TextSize = 15
+ZombieBtn.BorderSizePixel = 0
+ZombieBtn.Parent = Main
+
+local ZombieCorner = Instance.new("UICorner")
+ZombieCorner.CornerRadius = UDim.new(0, 8)
+ZombieCorner.Parent = ZombieBtn
+
+-- Кнопка KITCHEN GUN
+local KitchenBtn = Instance.new("TextButton")
+KitchenBtn.Size = UDim2.new(1, -30, 0, 45)
+KitchenBtn.Position = UDim2.new(0, 15, 0, 92)
+KitchenBtn.BackgroundColor3 = Color3.fromRGB(130, 40, 40)
+KitchenBtn.Text = "KITCHEN GUN"
+KitchenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KitchenBtn.Font = Enum.Font.GothamBold
+KitchenBtn.TextSize = 15
+KitchenBtn.BorderSizePixel = 0
+KitchenBtn.Parent = Main
+
+local KitchenCorner = Instance.new("UICorner")
+KitchenCorner.CornerRadius = UDim.new(0, 8)
+KitchenCorner.Parent = KitchenBtn
+
+-- ===== ZOMBIE BUTTON =====
+ZombieBtn.MouseButton1Click:Connect(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    local humanoid = character:WaitForChild("Humanoid")
+
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if animator then
+        animator:Destroy()
+    end
+
+    local Zombies = {}
+    local sight = 80
+    local caninfect = true
+    local canrandomwalk = true
+    local ragdolldeath = true
+    local step = game:GetService("RunService").Stepped
+
+    local function createZombie(model)
+        local self = {}
+        self.model = model
+        self.torso = model.Torso
+        self.head = model.Head
+        self.leftarm = model["Left Arm"]
+        self.rightarm = model["Right Arm"]
+        self.leftleg = model["Left Leg"]
+        self.rightleg = model["Right Leg"]
+        self.humanoid = model:FindFirstChildOfClass("Humanoid")
+        self.sine = 0
+        self.walking = false
+        self.attacking = false
+        self.cansay = true
+        self.candmg = true
+        self.saycooldown = 0
+
+        local ok = Instance.new("BoolValue", model)
+        ok.Name = "Zombie AI"
+
+        self.humanoid.MaxHealth = math.random(100, 400)
+        self.humanoid.Health = self.humanoid.MaxHealth
+
+        self.footstep = Instance.new("Sound", self.head)
+        self.footstep.Name = "footstep"
+        self.footstep.SoundId = "rbxassetid://4113577407"
+        self.footstep.Looped = true
+        self.footstep.Volume = 0
+        self.footstep:Play()
+
+        self.neck = self.torso.Neck
+        self.neck.C1 = CFrame.new(0, 0, 0)
+        self.leftshoulder = self.torso["Left Shoulder"]
+        self.leftshoulder.C1 = CFrame.new(0, 0, 0)
+        self.rightshoulder = self.torso["Right Shoulder"]
+        self.rightshoulder.C1 = CFrame.new(0, 0, 0)
+        self.lefthip = self.torso["Left Hip"]
+        self.lefthip.C1 = CFrame.new(0, 0, 0)
+        self.righthip = self.torso["Right Hip"]
+        self.righthip.C1 = CFrame.new(0, 0, 0)
+
+        if model:FindFirstChild("HumanoidRootPart") then
+            if model.HumanoidRootPart:FindFirstChild("RootJoint") then
+                self.root = model.HumanoidRootPart.RootJoint
+                self.root.C1 = CFrame.new(0, 0, 0)
+            elseif model.HumanoidRootPart:FindFirstChild("Root Hip") then
+                self.root = model.HumanoidRootPart["Root Hip"]
+                self.root.C1 = CFrame.new(0, 0, 0)
+            end
+        else
+            self.humanoid.Health = 0
+        end
+
+        function self:walkanim(walkspeed)
+            if walkspeed > 2 then
+                self.walking = true
+            else
+                self.walking = false
+            end
+        end
+        self.humanoid.Running:Connect(function(speed) self:walkanim(speed) end)
+
+        function self:walkrandomly()
+            while wait(math.random(3, 6)) do
+                if not self.walking and canrandomwalk then
+                    self.humanoid.WalkSpeed = 10
+                    local function createwalkpart()
+                        local walkpart = Instance.new("Part", self.model)
+                        walkpart.Size = Vector3.new(1, 1, 1)
+                        walkpart.Anchored = true
+                        walkpart.Material = "Neon"
+                        walkpart.Transparency = 1
+                        walkpart.BrickColor = BrickColor.new("Maroon")
+                        walkpart.CFrame = self.torso.CFrame * CFrame.new(math.random(-60, 60), math.random(-30, 30), math.random(-60, 60))
+                        local path = game:GetService("PathfindingService"):FindPathAsync(self.torso.Position, walkpart.Position)
+                        local waypoints = path:GetWaypoints()
+                        if path.Status == Enum.PathStatus.Success then
+                            for i, v in pairs(waypoints) do
+                                if canrandomwalk then
+                                    self.humanoid:MoveTo(v.Position)
+                                    local allow = 0
+                                    while (self.torso.Position - v.Position).magnitude > 4 and allow < 25 do
+                                        allow = allow + 1
+                                        wait()
+                                    end
+                                    if v.Action == Enum.PathWaypointAction.Jump then
+                                        self.humanoid.Jump = true
+                                    end
+                                end
+                            end
+                            for i, v in pairs(self.model:GetChildren()) do
+                                if v.Name == "pospart" then
+                                    v:Destroy()
+                                end
+                            end
+                        else
+                            createwalkpart()
+                            wait()
+                        end
+                    end
+                    createwalkpart()
+                end
+            end
+        end
+
+        function self:chase()
+            while true do
+                if not self.walking then
+                    for i, v in pairs(workspace:GetChildren()) do
+                        if not v:FindFirstChild("Zombie AI") and v:FindFirstChildOfClass("Humanoid") and v:FindFirstChild("Head") then
+                            if (v:FindFirstChild("Head").Position - self.head.Position).magnitude < sight then
+                                canrandomwalk = false
+                                local thehumanoid = v:FindFirstChildOfClass("Humanoid")
+                                local thehead = v:FindFirstChild("Head")
+                                while (thehead.Position - self.head.Position).magnitude < sight and thehumanoid.Health > 0 and not v:FindFirstChild("Zombie AI") do
+                                    self.humanoid.WalkSpeed = 13
+                                    self.humanoid:MoveTo(thehead.Position, thehead)
+                                    local path = game:GetService("PathfindingService"):FindPathAsync(self.torso.Position, thehead.Position)
+                                    local waypoints = path:GetWaypoints()
+                                    if path.Status == Enum.PathStatus.Success then
+                                        for q, w in pairs(waypoints) do
+                                            if q ~= 1 then
+                                                local allow = 0
+                                                self.humanoid:MoveTo(w.Position, thehead)
+                                                while (self.torso.Position - w.Position).magnitude > 3.8 and allow < 20 do
+                                                    allow = allow + 1
+                                                    game:GetService("RunService").Heartbeat:Wait()
+                                                end
+                                                if w.Action == Enum.PathWaypointAction.Jump then
+                                                    self.humanoid.Jump = true
+                                                end
+                                                if thehumanoid.Health <= 0 then
+                                                    break
+                                                end
+                                                if v:FindFirstChild("Zombie AI") then
+                                                    break
+                                                end
+                                            end
+                                        end
+                                        for q, w in pairs(self.model:GetChildren()) do
+                                            if w.Name == "pospart" then
+                                                w:Destroy()
+                                            end
+                                        end
+                                    else
+                                        self.humanoid:MoveTo(thehead.Position, thehead)
+                                    end
+                                    wait()
+                                end
+                                canrandomwalk = true
+                            else
+                                canrandomwalk = true
+                            end
+                        end
+                    end
+                end
+                wait()
+            end
+        end
+
+        function self:damage(part)
+            if part.Parent:FindFirstChildOfClass("Humanoid") and part.Name ~= "pospart" and not part.Parent:FindFirstChild("Zombie AI") and self.candmg then
+                local victimhumanoid = part.Parent:FindFirstChildOfClass("Humanoid")
+                victimhumanoid:TakeDamage(4)
+                if victimhumanoid.Health <= 4 and victimhumanoid.Health > 0 then
+                    self:infect(part.Parent)
+                end
+            end
+        end
+        self.torso.Touched:Connect(function(part) self:damage(part) end)
+
+        function self:infect(victim)
+            local deathrandom = math.random(1, 5)
+            local deathsound = Instance.new("Sound", victim.Head)
+            deathsound.Volume = 0.5
+            if deathrandom == 1 then
+                deathsound.SoundId = "rbxassetid://566988981"
+            elseif deathrandom == 2 then
+                deathsound.SoundId = "rbxassetid://884349060"
+            elseif deathrandom == 3 then
+                deathsound.SoundId = "rbxassetid://170399891"
+            elseif deathrandom == 4 then
+                deathsound.SoundId = "rbxassetid://402192395"
+            elseif deathrandom == 5 then
+                deathsound.SoundId = "rbxassetid://1835338424"
+            end
+            deathsound:Play()
+            if victim == game.Players.LocalPlayer.Character then
+                local ok = Instance.new("BoolValue", victim)
+                ok.Name = "Zombie AI"
+                for i, v in pairs(victim:GetChildren()) do
+                    if v.ClassName == "Script" and v.Name ~= "Health" then
+                        v:Destroy()
+                    end
+                end
+                local green = math.random(1, 3)
+                local color
+                if green == 1 then
+                    color = BrickColor.new("Sea green")
+                elseif green == 2 then
+                    color = BrickColor.new("Bright green")
+                elseif green == 3 then
+                    color = BrickColor.new("Forest green")
+                end
+                for i, v in pairs(victim:GetChildren()) do
+                    if v:IsA("MeshPart") or v:IsA("Part") then
+                        v.BrickColor = color
+                    end
+                end
+                local torso = victim.Torso
+                local head = victim.Head
+                local leftarm = victim["Left Arm"]
+                local rightarm = victim["Right Arm"]
+                local leftleg = victim["Left Leg"]
+                local rightleg = victim["Right Leg"]
+                local humanoid = victim:FindFirstChildOfClass("Humanoid")
+                local neck = torso.Neck
+                neck.C1 = CFrame.new(0, 0, 0)
+                local leftshoulder = torso["Left Shoulder"]
+                leftshoulder.C1 = CFrame.new(0, 0, 0)
+                local rightshoulder = torso["Right Shoulder"]
+                rightshoulder.C1 = CFrame.new(0, 0, 0)
+                local lefthip = torso["Left Hip"]
+                lefthip.C1 = CFrame.new(0, 0, 0)
+                local righthip = torso["Right Hip"]
+                righthip.C1 = CFrame.new(0, 0, 0)
+                local root
+                if victim:FindFirstChild("HumanoidRootPart") then
+                    if victim.HumanoidRootPart:FindFirstChild("RootJoint") then
+                        root = victim.HumanoidRootPart.RootJoint
+                        root.C1 = CFrame.new(0, 0, 0)
+                    elseif victim.HumanoidRootPart:FindFirstChild("Root Hip") then
+                        root = victim.HumanoidRootPart["Root Hip"]
+                        root.C1 = CFrame.new(0, 0, 0)
+                    end
+                end
+                local animator = humanoid:FindFirstChild("Animator")
+                if animator then animator:Destroy() end
+                local walking = false
+                humanoid.Running:Connect(function(speed)
+                    if speed > 2 then walking = true else walking = false end
+                end)
+                local sine = 0
+                local footstep = Instance.new("Sound", head)
+                footstep.Name = "footstep"
+                footstep.SoundId = "rbxassetid://4113577407"
+                footstep.Looped = true
+                footstep.Volume = 0
+                footstep:Play()
+                spawn(function()
+                    while humanoid.Health > 0 do
+                        sine = sine + 1
+                        if not walking then
+                            footstep.Volume = 0
+                            neck.C0 = neck.C0:Lerp(CFrame.new(0, 1.2, 0) * CFrame.Angles(math.sin(sine / 30) / 10, 0, 0) * CFrame.new(0, 0.25, 0), 0.1)
+                            righthip.C0 = righthip.C0:Lerp(CFrame.new(0.5, -1 - math.cos(sine / 30) / 15, 0) * CFrame.Angles(math.rad(10 + (2 * math.sin(-sine / 30))), 0, -math.sin(sine / 60) / 10) * CFrame.new(0, -1, 0), 0.1)
+                            lefthip.C0 = lefthip.C0:Lerp(CFrame.new(-0.5, -1 - math.cos(sine / 30) / 15, 0) * CFrame.Angles(math.rad(10 + (2 * math.sin(-sine / 30))), 0, -math.sin(sine / 60) / 10) * CFrame.new(0, -1, 0), 0.1)
+                            root.C0 = root.C0:Lerp(CFrame.new(0, math.cos(sine / 30) / 15, 0) * CFrame.Angles(math.rad(-10 + (2 * math.sin(sine / 30))), 0, math.sin(sine / 60) / 15), 0.1)
+                            rightshoulder.C0 = rightshoulder.C0:Lerp(CFrame.new(1.5, 0.5, 0) * CFrame.Angles(math.rad(20) + math.rad(5 * math.sin(sine / 30)), 0, math.rad(5 * math.cos(sine / 30) / 2)) * CFrame.new(0, -0.5, 0), 0.1)
+                            leftshoulder.C0 = leftshoulder.C0:Lerp(CFrame.new(-1.5, 0.5, 0) * CFrame.Angles(math.rad(20) - math.rad(5 * math.sin(sine / 30)), 0, -math.rad(5 * math.cos(sine / 30) / 2)) * CFrame.new(0, -0.5, 0), 0.1)
+                        else
+                            footstep.Volume = 0.5
+                            leftshoulder.C0 = leftshoulder.C0:Lerp(CFrame.new(-1.5, 0.5, 0) * CFrame.Angles(math.rad(100 - math.cos(sine / 5) * 10), 0, math.rad(math.sin(sine / 10) * 10)) * CFrame.new(0, -0.5, 0), 0.1)
+                            rightshoulder.C0 = rightshoulder.C0:Lerp(CFrame.new(1.5, 0.5, 0) * CFrame.Angles(math.rad(100 - math.cos(sine / 5) * 10), 0, math.rad(math.sin(sine / 10) * 10)) * CFrame.new(0, -0.5, 0), 0.1)
+                            neck.C0 = neck.C0:Lerp(CFrame.new(0, 1.2, 0) * CFrame.Angles(math.rad(10 + math.cos(sine / 5) * 6), 0, 0) * CFrame.new(0, 0.25, 0), 0.1)
+                            root.C0 = root.C0:Lerp(CFrame.new(0, math.sin(sine / 5) / 9, 0) * CFrame.Angles(math.rad(-15), 0, math.cos(sine / 10) / 6), 0.1)
+                            righthip.C0 = righthip.C0:Lerp(CFrame.new(0.5, -1 + math.cos(sine / 10) / 3, -math.cos(sine / 10) / 3) * CFrame.Angles(math.sin(sine / 10), 0, 0) * CFrame.new(0, -1, 0), 0.1)
+                            lefthip.C0 = lefthip.C0:Lerp(CFrame.new(-0.5, -1 - math.cos(sine / 10) / 3, math.cos(sine / 10) / 3) * CFrame.Angles(-math.sin(sine / 10), 0, 0) * CFrame.new(0, -1, 0), 0.1)
+                        end
+                        game:GetService("RunService").Stepped:Wait()
+                    end
+                end)
+                local damaging_part = victim:FindFirstChild("Torso") or victim:FindFirstChild("UpperTorso")
+                if damaging_part then
+                    damaging_part.Touched:Connect(function(hit)
+                        if hit.Parent:FindFirstChildOfClass("Humanoid") and hit.Name ~= "pospart" and not hit.Parent:FindFirstChild("Zombie AI") then
+                            local vh = hit.Parent:FindFirstChildOfClass("Humanoid")
+                            vh:TakeDamage(4)
+                            if vh.Health <= 4 and vh.Health > 0 then
+                                self:infect(hit.Parent)
+                            end
+                        end
+                    end)
+                end
+            else
+                if not caninfect then
+                    victim:FindFirstChildOfClass("Humanoid").Health = 0
+                    return
+                end
+                if victim:FindFirstChild("UpperTorso") then
+                    victim:FindFirstChildOfClass("Humanoid").Health = 0
+                    return
+                end
+                if victim:FindFirstChild("Torso") and victim:FindFirstChild("HumanoidRootPart") then
+                    victim.Head.CFrame = CFrame.new(victim.Head.Position, self.head.Position)
+                    victim:FindFirstChildOfClass("Humanoid").WalkSpeed = 0
+                    victim:FindFirstChildOfClass("Humanoid").JumpPower = 0
+                    local ok = Instance.new("BoolValue", victim)
+                    ok.Name = "Zombie AI"
+                    local rightarmw, leftarmw, rightlegw, leftlegw, humanoidrootpartw
+                    if victim:FindFirstChild("Right Arm") then
+                        rightarmw = Instance.new("Weld", victim.Torso)
+                        rightarmw.Part0 = victim.Torso
+                        rightarmw.Part1 = victim["Right Arm"]
+                        rightarmw.C0 = CFrame.new(1.5, 0, 0)
+                        rightarmw.Name = "RightArmWeld"
+                    end
+                    if victim:FindFirstChild("Right Leg") then
+                        rightlegw = Instance.new("Weld", victim.Torso)
+                        rightlegw.Part0 = victim.Torso
+                        rightlegw.Part1 = victim["Right Leg"]
+                        rightlegw.C0 = CFrame.new(0.5, -2, 0)
+                        rightlegw.Name = "RightLegWeld"
+                    end
+                    if victim:FindFirstChild("Left Arm") then
+                        leftarmw = Instance.new("Weld", victim.Torso)
+                        leftarmw.Part0 = victim.Torso
+                        leftarmw.Part1 = victim["Left Arm"]
+                        leftarmw.C0 = CFrame.new(-1.5, 0, 0)
+                        leftarmw.Name = "LeftArmWeld"
+                    end
+                    if victim:FindFirstChild("Left Leg") then
+                        leftlegw = Instance.new("Weld", victim.Torso)
+                        leftlegw.Part0 = victim.Torso
+                        leftlegw.Part1 = victim["Left Leg"]
+                        leftlegw.C0 = CFrame.new(-0.5, -2, 0)
+                        leftlegw.Name = "LeftLegWeld"
+                    end
+                    humanoidrootpartw = Instance.new("Weld", victim.HumanoidRootPart)
+                    humanoidrootpartw.Part0 = victim.HumanoidRootPart
+                    humanoidrootpartw.Part1 = victim.Torso
+                    humanoidrootpartw.Name = "HumanoidRootPartWeld"
+                    for i, v in pairs(victim:GetChildren()) do
+                        if v.ClassName == "Script" and v.Name ~= "Zombie AI" and v.Name ~= "Health" then
+                            v:Destroy()
+                        end
+                    end
+                    for i = 0, 1, 0.02 do
+                        if rightarmw then rightarmw.C0 = rightarmw.C0:Lerp(CFrame.new(1.64086914, 0.201171875, 0, 0.939692497, -0.342020094, 0, 0.342020124, 0.939692557, 0, 0, 0, 1), i) end
+                        if leftarmw then leftarmw.C0 = leftarmw.C0:Lerp(CFrame.new(-1.98254395, 0.588928223, 0, 0.342020214, 0.939692438, -1.77635663e-15, -0.939692497, 0.342020243, -3.55271368e-15, 0, 3.55271368e-15, 1), i) end
+                        if leftlegw then leftlegw.C0 = leftlegw.C0:Lerp(CFrame.new(-0.681274414, -2.07165527, 0, 0.984807611, 0.173648268, 0, -0.173648283, 0.98480767, 0, 0, 0, 1), i) end
+                        if rightlegw then rightlegw.C0 = rightlegw.C0:Lerp(CFrame.new(1.0670166, -2.11602783, 0, 0.866025329, -0.499999851, 0, 0.499999881, 0.866025388, 0, 0, 0, 1), i) end
+                        if humanoidrootpartw then humanoidrootpartw.C0 = humanoidrootpartw.C0:Lerp(CFrame.new(0, -2.60009766, 1.20001221, 0.99999994, 0, 0, 0, -4.37113883e-08, -1, 0, 1, -4.37113883e-08), i) end
+                        game:GetService("RunService").Heartbeat:Wait()
+                    end
+                    wait(1)
+                    for i, v in pairs(victim.Torso:GetChildren()) do
+                        if v.ClassName == "Weld" then
+                            v:Destroy()
+                        end
+                    end
+                    for i, v in pairs(victim.HumanoidRootPart:GetChildren()) do
+                        if v.ClassName == "Weld" then
+                            v:Destroy()
+                        end
+                    end
+                else
+                    victim:FindFirstChildOfClass("Humanoid").PlatformStand = true
+                    for i, v in pairs(victim:GetChildren()) do
+                        if v.ClassName == "Script" and v.Name ~= "Zombie AI" and v.Name ~= "Health" then
+                            v:Destroy()
+                        end
+                    end
+                    wait(1)
+                    victim.Archivable = true
+                    if victim:FindFirstChild("Torso") then
+                        for i, v in pairs(victim.Torso:GetChildren()) do
+                            if v.ClassName == "Weld" then
+                                v:Destroy()
+                            end
+                        end
+                    end
+                end
+                victim.Archivable = true
+                local clone = victim:Clone()
+                victim:Destroy()
+                clone.Name = clone.Name .. " (Zombie)"
+                clone.Parent = workspace
+                for i, v in pairs(clone:GetChildren()) do
+                    if v.ClassName == "Script" and v.Name ~= "Health" then
+                        v.Disabled = true
+                    end
+                end
+                wait(0.2)
+                local green = math.random(1, 3)
+                local color
+                if green == 1 then
+                    color = BrickColor.new("Sea green")
+                elseif green == 2 then
+                    color = BrickColor.new("Bright green")
+                elseif green == 3 then
+                    color = BrickColor.new("Forest green")
+                end
+                for i, v in pairs(clone:GetChildren()) do
+                    if v:IsA("MeshPart") or v:IsA("Part") then
+                        v.BrickColor = color
+                    end
+                end
+                createZombie(clone)
+            end
+        end
+
+        function self:death()
+            self.candmg = false
+            if self.model:FindFirstChild("Health") then
+                self.model.Health:Destroy()
+            end
+            if self.head:FindFirstChild("footstep") then
+                self.head.footstep:Destroy()
+            end
+            self.humanoid.Archivable = true
+            local zombiecorpse = self.model:Clone()
+            zombiecorpse:FindFirstChildOfClass("Humanoid").Health = 0
+            zombiecorpse:BreakJoints()
+            self.model:Destroy()
+            zombiecorpse.Parent = workspace
+            game.Debris:AddItem(zombiecorpse, 20)
+            local Humanoid = zombiecorpse:FindFirstChildOfClass("Humanoid")
+            local Torso = zombiecorpse.Torso
+            Humanoid.PlatformStand = true
+            for i, v in pairs(Humanoid.Parent.Torso:GetChildren()) do
+                if v:IsA('Motor6D') or v:IsA('Weld') then
+                    v:Destroy()
+                end
+            end
+            for i, v in pairs(zombiecorpse:GetChildren()) do
+                if v:IsA("Part") then
+                    for q, w in pairs(v:GetChildren()) do
+                        if w:IsA("BodyPosition") or w:IsA("BodyVelocity") then
+                            w:Destroy()
+                        end
+                    end
+                end
+            end
+            if zombiecorpse:FindFirstChild("Head") then
+                local deathrandom = math.random(1, 7)
+                local deathsound = Instance.new("Sound", zombiecorpse.Head)
+                deathsound.Volume = 3
+                if deathrandom == 1 then
+                    deathsound.SoundId = "rbxassetid://131138845"
+                elseif deathrandom == 2 then
+                    deathsound.SoundId = "rbxassetid://131138839"
+                elseif deathrandom == 3 then
+                    deathsound.SoundId = "rbxassetid://131138850"
+                elseif deathrandom == 4 then
+                    deathsound.SoundId = "rbxassetid://131138860"
+                elseif deathrandom == 5 then
+                    deathsound.SoundId = "rbxassetid://131138854"
+                elseif deathrandom == 6 then
+                    deathsound.SoundId = "rbxassetid://131138848"
+                elseif deathrandom == 7 then
+                    deathsound.SoundId = "rbxassetid://461063380"
+                end
+                deathsound:Play()
+            end
+            local function makeconnections(limb, attachementone, attachmenttwo, twistlower, twistupper, upperangle)
+                local connection = Instance.new('BallSocketConstraint', limb)
+                connection.LimitsEnabled = true
+                connection.Attachment0 = attachementone
+                connection.Attachment1 = attachmenttwo
+                connection.TwistLimitsEnabled = true
+                connection.TwistLowerAngle = twistlower
+                connection.TwistUpperAngle = twistupper
+                connection.UpperAngle = 70
+            end
+            local function makehingeconnections(limb, attachementone, attachmenttwo, twistlower, twistupper, upperangle)
+                local connection = Instance.new('HingeConstraint', limb)
+                connection.Attachment0 = attachementone
+                connection.Attachment1 = attachmenttwo
+                connection.LimitsEnabled = true
+                connection.LowerAngle = twistlower
+                connection.UpperAngle = twistupper
+            end
+            Humanoid.Parent['Right Arm'].RightShoulderAttachment.Position = Vector3.new(0, 0.5, 0)
+            Torso.RightCollarAttachment.Position = Vector3.new(1.5, 0.5, 0)
+            Humanoid.Parent['Left Arm'].LeftShoulderAttachment.Position = Vector3.new(0, 0.5, 0)
+            Torso.LeftCollarAttachment.Position = Vector3.new(-1.5, 0.5, 0)
+            local RightLegAttachment = Instance.new("Attachment", Humanoid.Parent["Right Leg"])
+            RightLegAttachment.Position = Vector3.new(0, 1, 0)
+            local TorsoRightLegAttachment = Instance.new("Attachment", Torso)
+            TorsoRightLegAttachment.Position = Vector3.new(0.5, -1, 0)
+            local LeftLegAttachment = Instance.new("Attachment", Humanoid.Parent["Left Leg"])
+            LeftLegAttachment.Position = Vector3.new(0, 1, 0)
+            local TorsoLeftLegAttachment = Instance.new("Attachment", Torso)
+            TorsoLeftLegAttachment.Position = Vector3.new(-0.5, -1, 0)
+            if Humanoid.Parent:FindFirstChild("Head") then
+                local HeadAttachment = Instance.new("Attachment", Humanoid.Parent.Head)
+                HeadAttachment.Position = Vector3.new(0, -0.5, 0)
+                makehingeconnections(Humanoid.Parent.Head, HeadAttachment, Torso.NeckAttachment, -20, 20, 70)
+            end
+            makeconnections(Humanoid.Parent['Right Arm'], Humanoid.Parent['Right Arm'].RightShoulderAttachment, Torso.RightCollarAttachment, -80, 80)
+            makeconnections(Humanoid.Parent['Left Arm'], Humanoid.Parent['Left Arm'].LeftShoulderAttachment, Torso.LeftCollarAttachment, -80, 80)
+            makeconnections(Humanoid.Parent['Right Leg'], RightLegAttachment, TorsoRightLegAttachment, -80, 80, 70)
+            makeconnections(Humanoid.Parent['Left Leg'], LeftLegAttachment, TorsoLeftLegAttachment, -80, 80, 70)
+            if Humanoid.Parent:FindFirstChild("Right Arm") then
+                local limbcollider = Instance.new("Part", Humanoid.Parent["Right Arm"])
+                limbcollider.Size = Vector3.new(1, 1.3, 1)
+                limbcollider.Shape = "Cylinder"
+                limbcollider.Transparency = 1
+                local limbcolliderweld = Instance.new("Weld", limbcollider)
+                limbcolliderweld.Part0 = Humanoid.Parent["Right Arm"]
+                limbcolliderweld.Part1 = limbcollider
+                limbcolliderweld.C0 = CFrame.fromEulerAnglesXYZ(0, 0, math.pi / 2) * CFrame.new(-0.4, 0, 0)
+                for i, v in pairs(zombiecorpse["Right Arm"]:GetChildren()) do
+                    if v:IsA('Motor6D') or v:IsA('Weld') then
+                        v:Destroy()
+                    end
+                end
+            end
+            if Humanoid.Parent:FindFirstChild("Left Arm") then
+                local limbcollider = Instance.new("Part", Humanoid.Parent["Left Arm"])
+                limbcollider.Size = Vector3.new(1, 1.3, 1)
+                limbcollider.Shape = "Cylinder"
+                limbcollider.Transparency = 1
+                local limbcolliderweld = Instance.new("Weld", limbcollider)
+                limbcolliderweld.Part0 = Humanoid.Parent["Left Arm"]
+                limbcolliderweld.Part1 = limbcollider
+                limbcolliderweld.C0 = CFrame.fromEulerAnglesXYZ(0, 0, math.pi / 2) * CFrame.new(-0.4, 0, 0)
+            end
+            if Humanoid.Parent:FindFirstChild("Left Leg") then
+                local limbcollider = Instance.new("Part", Humanoid.Parent["Left Leg"])
+                limbcollider.Size = Vector3.new(1, 1.3, 1)
+                limbcollider.Shape = "Cylinder"
+                limbcollider.Transparency = 1
+                local limbcolliderweld = Instance.new("Weld", limbcollider)
+                limbcolliderweld.Part0 = Humanoid.Parent["Left Leg"]
+                limbcolliderweld.Part1 = limbcollider
+                limbcolliderweld.C0 = CFrame.fromEulerAnglesXYZ(0, 0, math.pi / 2) * CFrame.new(-0.4, 0, 0)
+            end
+            if Humanoid.Parent:FindFirstChild("Right Leg") then
+                local limbcollider = Instance.new("Part", Humanoid.Parent["Right Leg"])
+                limbcollider.Size = Vector3.new(1, 1.3, 1)
+                limbcollider.Shape = "Cylinder"
+                limbcollider.Transparency = 1
+                local limbcolliderweld = Instance.new("Weld", limbcollider)
+                limbcolliderweld.Part0 = Humanoid.Parent["Right Leg"]
+                limbcolliderweld.Part1 = limbcollider
+                limbcolliderweld.C0 = CFrame.fromEulerAnglesXYZ(0, 0, math.pi / 2) * CFrame.new(-0.4, 0, 0)
+            end
+            Humanoid.Health = 0
+            local ragdoll = zombiecorpse
+            if ragdoll:FindFirstChild("HumanoidRootPart") then
+                ragdoll.HumanoidRootPart.CanCollide = false
+                ragdoll.HumanoidRootPart:Destroy()
+            end
+            wait(0.5)
+            for i, v in pairs(ragdoll:GetChildren()) do
+                if v:IsA('Script') then
+                    v.Disabled = true
+                end
+            end
+        end
+        self.humanoid.Died:Connect(function() self:death() end)
+
+        function self:animate()
+            self.sine = self.sine + 1
+            if not self.walking then
+                self.footstep.Volume = 0
+                self.neck.C0 = self.neck.C0:Lerp(CFrame.new(0, 1.2, 0) * CFrame.Angles(math.sin(self.sine / 30) / 10, 0, 0) * CFrame.new(0, 0.25, 0), 0.1)
+                self.righthip.C0 = self.righthip.C0:Lerp(CFrame.new(0.5, -1 - math.cos(self.sine / 30) / 15, 0) * CFrame.Angles(math.rad(10 + (2 * math.sin(-self.sine / 30))), 0, -math.sin(self.sine / 60) / 10) * CFrame.new(0, -1, 0), 0.1)
+                self.lefthip.C0 = self.lefthip.C0:Lerp(CFrame.new(-0.5, -1 - math.cos(self.sine / 30) / 15, 0) * CFrame.Angles(math.rad(10 + (2 * math.sin(-self.sine / 30))), 0, -math.sin(self.sine / 60) / 10) * CFrame.new(0, -1, 0), 0.1)
+                self.root.C0 = self.root.C0:Lerp(CFrame.new(0, math.cos(self.sine / 30) / 15, 0) * CFrame.Angles(math.rad(-10 + (2 * math.sin(self.sine / 30))), 0, math.sin(self.sine / 60) / 15), 0.1)
+                self.rightshoulder.C0 = self.rightshoulder.C0:Lerp(CFrame.new(1.5, 0.5, 0) * CFrame.Angles(math.rad(20) + math.rad(5 * math.sin(self.sine / 30)), 0, math.rad(5 * math.cos(self.sine / 30) / 2)) * CFrame.new(0, -0.5, 0), 0.1)
+                self.leftshoulder.C0 = self.leftshoulder.C0:Lerp(CFrame.new(-1.5, 0.5, 0) * CFrame.Angles(math.rad(20) - math.rad(5 * math.sin(self.sine / 30)), 0, -math.rad(5 * math.cos(self.sine / 30) / 2)) * CFrame.new(0, -0.5, 0), 0.1)
+            else
+                self.footstep.Volume = 0.5
+                self.leftshoulder.C0 = self.leftshoulder.C0:Lerp(CFrame.new(-1.5, 0.5, 0) * CFrame.Angles(math.rad(100 - math.cos(self.sine / 5) * 10), 0, math.rad(math.sin(self.sine / 10) * 10)) * CFrame.new(0, -0.5, 0), 0.1)
+                self.rightshoulder.C0 = self.rightshoulder.C0:Lerp(CFrame.new(1.5, 0.5, 0) * CFrame.Angles(math.rad(100 - math.cos(self.sine / 5) * 10), 0, math.rad(math.sin(self.sine / 10) * 10)) * CFrame.new(0, -0.5, 0), 0.1)
+                self.neck.C0 = self.neck.C0:Lerp(CFrame.new(0, 1.2, 0) * CFrame.Angles(math.rad(10 + math.cos(self.sine / 5) * 6), 0, 0) * CFrame.new(0, 0.25, 0), 0.1)
+                self.root.C0 = self.root.C0:Lerp(CFrame.new(0, math.sin(self.sine / 5) / 9, 0) * CFrame.Angles(math.rad(-15), 0, math.cos(self.sine / 10) / 6), 0.1)
+                self.righthip.C0 = self.righthip.C0:Lerp(CFrame.new(0.5, -1 + math.cos(self.sine / 10) / 3, -math.cos(self.sine / 10) / 3) * CFrame.Angles(math.sin(self.sine / 10), 0, 0) * CFrame.new(0, -1, 0), 0.1)
+                self.lefthip.C0 = self.lefthip.C0:Lerp(CFrame.new(-0.5, -1 - math.cos(self.sine / 10) / 3, math.cos(self.sine / 10) / 3) * CFrame.Angles(-math.sin(self.sine / 10), 0, 0) * CFrame.new(0, -1, 0), 0.1)
+            end
+        end
+
+        if self.model ~= game.Players.LocalPlayer.Character then
+            spawn(function() self:walkrandomly() end)
+            spawn(function() self:chase() end)
+        end
+
+        table.insert(Zombies, self)
+        return self
+    end
+
+    local green = math.random(1, 3)
+    local color
+    if green == 1 then
+        color = BrickColor.new("Sea green")
+    elseif green == 2 then
+        color = BrickColor.new("Bright green")
+    elseif green == 3 then
+        color = BrickColor.new("Forest green")
+    end
+    for i, v in pairs(character:GetChildren()) do
+        if v:IsA("MeshPart") or v:IsA("Part") then
+            v.BrickColor = color
+        end
+    end
+
+    createZombie(character)
+
+    while step:Wait() do
+        for _, z in ipairs(Zombies) do
+            z:animate()
+        end
+    end
+end)
+
+-- ===== KITCHEN GUN BUTTON =====
+KitchenBtn.MouseButton1Click:Connect(function()
+    spawn(function()
+        --[[ Kitchen Gun (REMADE) ]]--
+        local multiplier = 1
+        local soundlist = {
+            HardHit1 = "rbxassetid://565207203",
+            HardHit2 = "rbxassetid://541909913",
+            HardHit3 = "rbxassetid://541909983",
+            WeakHit1 = "rbxassetid://558642292",
+            WeakHit2 = "rbxassetid://541907812",
+            Slice1 = "rbxassetid://260429964",
+            Slice2 = "rbxassetid://260430015",
+            Explosion1 = "rbxassetid://138186576",
+            Explosion2 = "rbxassetid://157878578",
+            Woosh1 = "rbxassetid://541909867",
+            Woosh2 = "rbxassetid://541909763",
+        }
+        local bgmusic = Instance.new("Sound")
+        bgmusic.Volume = 3.5
+        bgmusic.SoundId = "rbxassetid://877658690"
+        bgmusic.Looped = true
+        bgmusic.Parent = game:GetService('Players').LocalPlayer.Character.Torso
+        bgmusic:Play()
+
+        local plr = game:GetService('Players').LocalPlayer
+        local char = plr.Character
+        local mouse = plr:GetMouse()
+        local input = game:GetService('UserInputService')
+
+        local joints = {"Right Shoulder", "Left Shoulder", "Right Hip", "Left Hip", "Neck", "RootJoint"}
+        local torso,head,rootpart = char.Torso,char.Head,char.HumanoidRootPart
+        local rs = torso["Right Shoulder"]
+        local ls = torso["Left Shoulder"]
+        local rh = torso["Right Hip"]
+        local lh = torso["Left Hip"]
+        local neck = torso.Neck
+        local rj = rootpart["RootJoint"]
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+
+        local huge = Vector3.new(math.huge, math.huge, math.huge)
+        local attacking = false
+        local cananim = true
+        local currentanim = "Idle"
+        local mode = "Normal"
+
+        function addattack(keycode, func)
+            if keycode ~= "MouseClick" then
+                input.InputBegan:connect(function(inp)
+                    if inp.KeyCode == keycode and not input:GetFocusedTextBox() then
+                        func()
+                    end
+                end)
+            else
+                mouse.Button1Down:connect(function()
+                    func()
+                end)
+            end
+        end
+        function swait(t)
+            if t then
+                for i = 0, t do
+                    game:GetService('RunService').Stepped:wait(0)
+                end
+            else
+                game:GetService('RunService').Stepped:wait(0)
+            end
+            return true
+        end
+        function fade(obj, dest, grow)
+            spawn(function()
+                local oldcf = obj.CFrame
+                for i = 0, 10 do
+                    if grow then
+                        obj.Size = obj.Size +Vector3.new(1,1,1)
+                        obj.CFrame = oldcf
+                    end
+                    obj.Transparency = obj.Transparency +0.1
+                    swait()
+                end
+                if dest then
+                obj:Destroy()
+                end
+            end)
+        end
+        function replacejoint(name)
+            local j = torso:FindFirstChild(name)
+            if not j then j = char.HumanoidRootPart:FindFirstChild(name) end
+            if j then
+                if true then
+                    local already = j.Parent:FindFirstChild(j.Name.." Replacement")
+                    local new = Instance.new("Weld")
+                    local c0 = j.C0
+                    local c1 = j.C1
+                    new.Part0 = j.Part0
+                    j.Part0 = nil
+                    new.Name = j.Name.." Replacement"
+                    if already then c0 = already.C0 c1 = already.C1 already:Destroy() end
+                    new.Parent = j.Parent
+                    new.Part1 = j.Part1
+                    new.C0 = c0
+                    new.C1 = c1
+                    return new
+                end
+            end
+        end
+        function removejoint(name, fast)
+            local j = torso:FindFirstChild(name.." Replacement")
+            if not j then j = char.HumanoidRootPart:FindFirstChild(name.." Replacement") end
+            if j then
+                local p0 = j.Part0
+                if p0 ~= nil then
+                local c0 = j.C0
+                local c1 = j.C1
+                j:Destroy()
+                local new = p0:FindFirstChild(name)
+                local ac0 = new.C0
+                local ac1 = new.C1
+                new.Part0 = p0
+                new.C0 = c0
+                new.C1 = c1
+                spawn(function()
+                    if name ~= "RootJoint" then
+                    if not fast then
+                    for i = 0, 0.6, 0.1 do
+                        new.C0 = new.C0:Lerp(ac0, 0.5)
+                        new.C1 = new.C1:lerp(ac1, 0.5)
+                        swait()
+                    end
+                    else
+                        new.C0 = new.C0:Lerp(ac0, 1)
+                        new.C1 = new.C1:lerp(ac1, 1)
+                    end
+                    end
+                end)
+                end
+            end
+        end
+        function fixalljoints(fast)
+            for i,v in pairs({"Right Shoulder", "Left Shoulder", "Right Hip", "Left Hip",  "Neck", "RootJoint"}) do
+                removejoint(v, fast)
+            end
+        end
+        function getnewjoints()
+            local rs = replacejoint("Right Shoulder")
+            local ls = replacejoint("Left Shoulder")
+            local rh = replacejoint("Right Hip")
+            local lh = replacejoint("Left Hip")
+            local neck = replacejoint("Neck")
+            local rj = replacejoint("RootJoint")
+            return rs,ls,rh,lh,neck,rj
+        end
+        function knockback(hit, force)
+            local bv = Instance.new("BodyVelocity")
+            bv.MaxForce = huge
+            bv.Velocity = force
+            bv.Parent = hit
+            game:GetService('Debris'):AddItem(bv, 0.15)
+        end
+        function soundeffect(id, volume, speed, parent, forcewait)
+            local func = function()
+                local s = Instance.new("Sound")
+                s.Name = "SoundEffect"
+                s.Volume = volume
+                s.PlaybackSpeed = speed
+                s.SoundId = id
+                s.Looped = false
+                s.Parent = parent
+                s:Play()
+                repeat wait() until not s.Playing
+                s:Destroy()
+            end
+            if forcewait then
+                func()
+            else
+                spawn(func)
+            end
+        end
+        function specialsound(id, volume, speed, parent, starts, ends)
+            local func = function()
+                local s = Instance.new("Sound")
+                s.Name = "SoundEffect"
+                s.Volume = volume
+                s.PlaybackSpeed = speed
+                s.SoundId = id
+                s.TimePosition = starts
+                s.Looped = false
+                s.Parent = parent
+                s:Play()
+                repeat swait() until s.TimePosition >= ends
+                s:Destroy()
+            end
+            spawn(func)
+        end
+        function hurt(hit, dmg)
+            local hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+            if hum then
+                if hum.Parent ~= char and not hum.Parent:FindFirstChild("kk_urcool") then
+                    hum.Health = hum.Health - dmg
+                    return true
+                end
+            end
+        end
+        function disable(hit)
+            pcall(function()
+                for i,v in pairs(hit.Parent:GetChildren()) do
+                    if v:IsA("Script") and v.Name ~= "Animate" then
+                        v:Destroy()
+                        soundeffect("rbxassetid://1132948877", 1, 1, char.Head)
+                    end
+                    if v:IsA("Model") then
+                        v:BreakJoints()
+                    end
+                    if v.Name ~= "Torso" and v.Name ~= "HumanoidRootPart" then
+                        for _,child in pairs(v:GetChildren()) do
+                            if child:IsA("Weld") then
+                                child:Destroy()
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        humanoid.Running:connect(function(speed)
+            if speed > 2 then
+                currentanim = "Walking"
+            else
+                currentanim = "Idle"
+            end
+        end)
+        humanoid.Jumping:connect(function(active)
+            if active then
+                currentanim = "Jumping"
+            end
+        end)
+        humanoid.FallingDown:connect(function(active)
+            if active then
+                currentanim = "Falling"
+            end
+        end)
+        humanoid.FreeFalling:connect(function(active)
+            if active and char.HumanoidRootPart.Velocity.Y < 0 then
+                currentanim = "Falling"
+            end
+        end)
+        pcall(function()
+            char.Animate:Destroy()
+        end)
+        for i,v in pairs(humanoid:GetPlayingAnimationTracks()) do
+            v:Stop()
+        end
+
+        local gun = Instance.new("Part")
+        gun.Size = Vector3.new(1, 1, 2)
+        gun.CanCollide = false
+        gun.Anchored = false
+        gun.Color = Color3.new(0,0,0)
+        local gunw = Instance.new("Weld")
+        gunw.Name = "GunWeld"
+        gunw.Part0 = gun
+        gunw.Part1 = char["Right Arm"]
+        gunw.C1 = CFrame.new(0,-1,-0.25) *CFrame.Angles(math.rad(270),math.rad(0),math.rad(0))
+        gunw.Parent = gun
+        local m = Instance.new("SpecialMesh")
+        m.MeshId = "http://www.roblox.com/asset/?id=4372594"
+        m.Scale = Vector3.new(1.2,1.2,1.2)
+        m.Parent = gun
+        gun.Parent = char
+
+        addattack(Enum.KeyCode.R, function()
+            if not attacking then
+                if mode == "Normal" then
+                    mode = "Heal"
+                    gun.Color = Color3.new(0,1,0)
+                    specialsound("rbxassetid://741894739", 5, 1, char, 18.49549100592, 20.526269195994)
+                else
+                    gun.Color = Color3.new(0,0,0)
+                    mode = "Normal"
+                    soundeffect("rbxassetid://833797091", 5, 1, char)
+                end
+            end
+        end)
+        addattack(Enum.KeyCode.Q, function()
+            if not attacking then
+                mode = "Disable"
+                gun.Color = Color3.new(1,0,0)
+                specialsound("rbxassetid://741894739", 5, 1, char, 33.878067323327, 35.438444041738)
+            end
+        end)
+        addattack(Enum.KeyCode.P, function()
+            if bgmusic.Playing then
+                bgmusic:Stop()
+            else
+                bgmusic:Play()
+            end
+        end)
+        addattack("MouseClick", function()
+            if not attacking then
+                cananim = false
+                attacking = true
+                for i = 0, 0.6, 0.1 do
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.6)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(-0.235909924, 0.846874475, 0, 0.399310559, 0.00480417395, 0.916803062, -0.916736782, -0.0110294167, 0.399339437, 0.0120302998, -0.99992764, 5.25861077e-10), 0.6)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.6)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(0.232030958, 1.28329468, 0, 0.758646905, 0.0105680302, -0.651416421, 0.65135318, 0.00907341763, 0.758720517, 0.0139287533, -0.999902964, -6.08845141e-10), 0.6)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.6)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.5, 1, 0, -4.37113883e-08, 0, 1, 0, 1, 0, -1, 0, -4.37113883e-08), 0.6)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.6)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.5, 1, 0, -4.37113883e-08, 0, -1, 0, 1, 0, 1, 0, -4.37113883e-08), 0.6)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0), 0.6)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0), 0.6)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0), 0.6)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0), 0.6)
+                    swait()
+                end
+                local sounds = {
+                    {17.49, 17.981267708586};
+                    {17.490114626798, 17.755552823579};
+                    {18, 18.465876732586707476};
+                }
+                local ids = sounds[math.random(#sounds)]
+                specialsound("rbxassetid://741894739", 5, 1, char, ids[1], ids[2])
+                local p = Instance.new("Part")
+                p.Anchored = false
+                p.Material = "Neon"
+                p.CanCollide = false
+                local start = gun.Position +Vector3.new(0.5,0,-0.5)
+                local endp = mouse.Hit.p
+                local ray = Ray.new(start, (endp-start).unit * 999)
+                local hit,position = workspace:FindPartOnRayWithIgnoreList(ray, {char, gun})
+                local mag = (start-position).magnitude + 2
+                p.Size = Vector3.new(0.1,0.1,mag)
+                p.CFrame = CFrame.new(start, position) *CFrame.new(0,0,-mag/2)
+                local bp = Instance.new("BodyPosition")
+                bp.MaxForce = huge
+                bp.Position = p.Position
+                bp.Parent = p
+                p.Color = gun.Color
+                if mode == "Normal" then
+                    p.Color = Color3.new(1,1,1)
+                end
+                p.Parent = workspace
+                spawn(function()
+                    for i = 1, 10 do
+                        p.Transparency = i/10
+                        swait()
+                    end
+                    p:Destroy()
+                end)
+                local con
+                local dmg = 750
+                if mode == "Heal" then dmg = -1000 end
+                if mode == "Disable" then dmg = 0 end
+                con = p.Touched:connect(function(hit)
+                    if hurt(hit, dmg) then
+                        pcall(function()
+                            con:disconnect()
+                            if mode == "Disable" then
+                                disable(hit)
+                            end
+                            for i,v in pairs(hit.Parent:GetDescendants()) do
+                                spawn(function()
+                                    if v:IsA("BasePart") and mode == "Normal" then
+                                        local bv = Instance.new("BodyVelocity")
+                                        bv.MaxForce = huge
+                                        bv.Velocity = CFrame.new(start, position).lookVector*100
+                                        bv.Parent = v
+                                        game:GetService('Debris'):AddItem(bv, 0.1)
+                                        if v.Transparency <= 0.9 then
+                                            for i = 1, 20 do
+                                                v.Transparency = i/20
+                                                swait()
+                                            end
+                                        end
+                                        v:Destroy()
+                                    end
+                                end)
+                            end
+                        end)
+                    end
+                end)
+                for i = 0, 0.3, 0.1 do
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.8)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(-0.108213484, 0.142491132, -0.0458124876, 0.399310559, 0.00480417395, 0.916803062, -0.907117367, -0.142995536, 0.395841271, 0.133000448, -0.989711702, -0.0527416691), 0.8)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.8)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(-0.214841455, 0.866598129, -0.112976491, 0.758646905, 0.0105680302, -0.651416421, 0.64655149, -0.135239884, 0.750787199, -0.0801631361, -0.990756512, -0.109432101), 0.8)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.8)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.5, 1, 0, -4.37113883e-08, 0, 1, -0.104150683, 0.994561553, -4.55257076e-09, -0.994561553, -0.104150683, -4.34736656e-08), 0.8)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.8)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.5, 1, 0, -4.37113883e-08, 0, -1, -0.0883838907, 0.996086478, 3.8633825e-09, 0.996086478, 0.0883838907, -4.35403216e-08), 0.8)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0), 0.8)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.49999997, 0, -1, 0, 0, 0, 0.0492738597, 0.998785317, 0, 0.998785317, -0.0492738597), 0.8)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0), 0.8)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0.0276213959, 0.999618471, 0, 0.999618471, -0.0276213959), 0.8)
+                    swait()
+                end
+                cananim = true
+                attacking = false
+            end
+        end)
+
+        while true do
+            swait()
+            if not char or not char.Parent or not char:FindFirstChild("Humanoid") then break end
+            if currentanim == "Idle" and cananim then
+                for i = 0, 5, 0.1 do
+                    if currentanim ~= "Idle" or not cananim then break end
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.05)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(0.0997244716, -0.105339587, -1.12973166, -0.155881107, 0.00388455181, 0.987768173, -0.0249122381, -0.999689579, -1.08894849e-09, 0.987461567, -0.0246075168, 0.155929506), 0.05)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.05)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(0.998242438, 0.966719627, -0.251513988, 0.948773444, -0.0191214401, -0.315378129, 0.315314144, -0.00635479437, 0.948966026, -0.0201497618, -0.999796987, 8.80774065e-10), 0.05)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.05)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.5, 1, 0, -0.246849835, 0, 0.969053745, 0, 1, 0, -0.969053745, 0, -0.246849835), 0.05)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.05)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.5, 1, 0, 0.0194152314, 0, -0.99981153, 0, 1, 0, 0.99981153, 0, 0.0194152314), 0.05)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.05)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.05)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.05)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0, 0, -0.996639967, -0.0819067881, 0, 0, 0, 1, -0.0819067881, 0.996639967, 0), 0.05)
+                    swait()
+                end
+                for i = 0, 5, 0.1 do
+                    if currentanim ~= "Idle" or not cananim then break end
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.05)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(0.0997244716, -0.134959042, -1.07218063, -0.155881107, 0.00388455181, 0.987768173, 0.0728884861, -0.997220755, 0.0154243633, 0.985082865, 0.0744013041, 0.155164748), 0.05)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.05)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(0.994734883, 0.934069037, -0.221951187, 0.958276987, -0.133620545, -0.252687156, 0.254302055, -0.00512516592, 0.96711117, -0.130520999, -0.991019309, 0.0290686507), 0.05)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.05)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.5, 1, 0, -0.246849835, 0, 0.969053745, 0, 1, 0, -0.969053745, 0, -0.246849835), 0.05)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.05)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.49999997, 1, 0, 0.0194152314, 0, -0.99981153, 0, 1, 0, 0.99981153, 0, 0.0194152314), 0.05)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.05)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.05)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.05)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0, 0, -0.996639967, -0.0819067881, 0, -0.00139390712, 0.0169610307, 0.999855161, -0.0818949267, 0.996495605, -0.017018212), 0.05)
+                    swait()
+                end
+            end
+            if currentanim == "Walking" and cananim then
+                for i = 0, 0.6, 0.1 do
+                    if currentanim ~= "Walking" or not cananim then break end
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.6)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(0.0997244716, -0.134959042, -0.791477084, -0.155881107, 0.00388455181, 0.987768173, 0.0728884861, -0.997220755, 0.0154243633, 0.985082865, 0.0744013041, 0.155164748), 0.6)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.6)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(0.728777826, 0.934069037, -0.221951187, 0.958276987, -0.133620545, -0.252687156, 0.254302055, -0.00512516592, 0.96711117, -0.130520999, -0.991019309, 0.0290686507), 0.6)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.6)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.49999997, 1, 0, -0.0421661586, 0.0827250704, 0.995679915, -0.568820775, 0.817300439, -0.0919936299, -0.82137984, -0.570242465, 0.0125933159), 0.6)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.6)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.49999997, 1, 0, 0.0194152314, 0, -0.99981153, -0.845399499, 0.53388226, -0.0164167192, 0.533781588, 0.845558882, 0.0103654461), 0.6)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.6)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0.0515226237, 0.99867183, 0, 0.99867183, -0.0515226237), 0.6)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.6)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0.239933819, 0, -0.996639967, -0.0819067881, 0, 0.00819849782, -0.0997591168, 0.994977891, -0.0814954415, 0.991634667, 0.100095451), 0.6)
+                    swait()
+                end
+            end
+            if currentanim == "Jumping" and cananim then
+                for i = 0, 1.2, 0.1 do
+                    if currentanim ~= "Jumping" or not cananim then break end
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.4)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(0.0997244716, 0.195344329, -0.746855855, -0.155881107, 0.00388455181, 0.987768173, 0.260807574, -0.964343727, 0.0449508503, 0.952722609, 0.264624417, 0.149309859), 0.4)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.4)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(0.793125331, 0.89348793, -0.0677016973, 0.986068428, -0.132806748, -0.100156575, 0.1031176, 0.0155911446, 0.994546831, -0.130520999, -0.991019309, 0.0290686507), 0.4)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.4)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.49999997, 0.99999994, -4.47034836e-08, -0.0421661586, 0.0827250704, 0.995679915, 0.25110203, 0.965456486, -0.0695800334, -0.967041731, 0.247083336, -0.0614820197), 0.4)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.4)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.49999997, 1, 2.98023224e-08, 0.0194152314, 0, -0.99981153, 0.178683311, 0.983900607, 0.00346983178, 0.983715117, -0.178716987, 0.0191026554), 0.4)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.4)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0.0515226237, 0.99867183, 0, 0.99867183, -0.0515226237), 0.4)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.4)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0.128909558, -0.0269506648, -0.996639967, -0.0819067881, 0, -0.00100739487, 0.0122579783, 0.999924421, -0.0819005966, 0.996564567, -0.0122992992), 0.4)
+                    swait()
+                end
+            end
+            if currentanim == "Falling" and cananim then
+                for i = 0, 1.2, 0.1 do
+                    if currentanim ~= "Falling" or not cananim then break end
+                    rs.C0 = rs.C0:Lerp(CFrame.new(1, 0.5, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.4)
+                    rs.C1 = rs.C1:Lerp(CFrame.new(0.0997244716, 0.389569163, -0.799008012, -0.155881107, 0.00388455181, 0.987768173, 0.0170185864, -0.999833226, 0.00661772862, 0.987629175, 0.0178419873, 0.155789018), 0.4)
+                    ls.C0 = ls.C0:Lerp(CFrame.new(-1, 0.5, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.4)
+                    ls.C1 = ls.C1:Lerp(CFrame.new(0.800841689, 0.89348793, 0.000534057617, 0.989977896, 0.0953866094, -0.104139231, 0.1031176, 0.0155911446, 0.994546831, 0.0964901, -0.995318174, 0.00559884822), 0.4)
+                    rh.C0 = rh.C0:Lerp(CFrame.new(1, -1, 0, -4.37113883e-08, 0, 1, -0, 0.99999994, 0, -1, 0, -4.37113883e-08), 0.4)
+                    rh.C1 = rh.C1:Lerp(CFrame.new(0.49999997, 1, -1.49011612e-08, -0.0421661586, 0.0827250704, 0.995679915, -0.0600035824, 0.994557679, -0.085172914, -0.997307122, -0.0633357614, -0.0369728766), 0.4)
+                    lh.C0 = lh.C0:Lerp(CFrame.new(-1, -1, 0, -4.37113883e-08, 0, -1, 0, 0.99999994, 0, 1, 0, -4.37113883e-08), 0.4)
+                    lh.C1 = lh.C1:Lerp(CFrame.new(-0.499999881, 1, 3.7252903e-08, 0.0207479522, -0.155918092, -0.987552047, -0.00691960612, 0.987718761, -0.156089753, 0.999760866, 0.0100720376, 0.0194142479), 0.4)
+                    neck.C0 = neck.C0:Lerp(CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.4)
+                    neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0.0515226237, 0.99867183, 0, 0.99867183, -0.0515226237), 0.4)
+                    rj.C0 = rj.C0:Lerp(CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), 0.4)
+                    rj.C1 = rj.C1:Lerp(CFrame.new(0, 0.313415587, -0.0163925812, -0.996639967, -0.0819067881, 0, 0.00564728118, -0.0687159598, 0.997620344, -0.0817118809, 0.994268239, 0.068947643), 0.4)
+                    swait()
+                end
+            end
+        end
+    end)
+end)
