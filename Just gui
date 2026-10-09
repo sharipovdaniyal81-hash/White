@@ -91,18 +91,8 @@ local KitchenCorner = Instance.new("UICorner")
 KitchenCorner.CornerRadius = UDim.new(0, 8)
 KitchenCorner.Parent = KitchenBtn
 
-local function resetCharacter()
-    local plr = game.Players.LocalPlayer
-    if plr.Character then
-        plr.Character:BreakJoints()
-    end
-    plr.CharacterAdded:Wait()
-    task.wait(1.5)
-end
-
 ZombieBtn.MouseButton1Click:Connect(function()
     spawn(function()
-        resetCharacter()
         local player = game.Players.LocalPlayer
         local character = player.Character
         local humanoid = character:WaitForChild("Humanoid")
@@ -730,7 +720,6 @@ end)
 
 KitchenBtn.MouseButton1Click:Connect(function()
     spawn(function()
-        resetCharacter()
 --[[ Kitchen Gun (REMADE) ]]--
 -------------------------------------------------------
 --[[
