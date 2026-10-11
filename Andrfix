@@ -1,0 +1,800 @@
+writefile("Maxilito.mp3", game:HttpGet("https://github.com/ian49972/smth/raw/refs/heads/main/Maxilito.mp3"))
+
+local playerss = game:GetService("Players").LocalPlayer.Character
+local dammf = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+dammf.RequiresNeck = false
+dammf.BreakJointsOnDeath = false
+
+-- СОХРАНЯЕМ ОДЕЖДУ (не удаляется)
+local savedClothing = {}
+for _, v in pairs(playerss:GetChildren()) do
+    if v:IsA("Accessory") or v:IsA("Shirt") or v:IsA("Pants") or v:IsA("BodyColors") or v:IsA("CharacterMesh") then
+        table.insert(savedClothing, v)
+    end
+end
+for _, v in pairs(dammf:GetChildren()) do
+    if v:IsA("Shirt") or v:IsA("Pants") then
+        table.insert(savedClothing, v)
+    end
+end
+
+for stupidfucking, omfg in pairs(playerss:GetChildren()) do
+    if omfg:IsA("BasePart") then
+        omfg.Anchored = true
+        omfg.Velocity = Vector3.new(0, 0, 0)
+        if omfg.Name == "HumanoidRootPart" then
+            omfg.Transparency = 1
+        else
+            omfg.Transparency = 0
+        end
+        for _, child in pairs(omfg:GetChildren()) do
+            if child:IsA("Motor6D") then
+                child.Part0 = nil
+            end
+        end
+    end
+end
+
+for _, v in pairs(savedClothing) do
+    if v and not v:IsDescendantOf(playerss) then
+        pcall(function() v.Parent = (v:IsA("Shirt") or v:IsA("Pants")) and dammf or playerss end)
+    end
+end
+
+spawn(function()
+    local head = playerss:WaitForChild("Head")
+    head.Color = Color3.fromRGB(128, 128, 128)
+    while true do
+        for _, obj in pairs(head:GetChildren()) do
+            if obj:IsA("SpecialMesh") and obj.Name ~= "Mesh" then
+                obj:Destroy()
+            end
+        end
+        wait(1)
+    end
+end)
+
+function randomstring()
+    local e = {}
+    for i = 1, math.random(1, 10) do
+        table.insert(e, #e + 1, utf8.char(math.random(0, 10175)))
+    end
+    return table.concat(e)
+end
+
+local event,connection,backups = nil,nil,{}
+local cn,euler,rad,random,c3,v3,clamp,sin,cos = CFrame.new,CFrame.fromEulerAnglesYXZ,math.rad,math.random,Color3.fromRGB,Vector3.new,math.clamp,math.sin,math.cos
+local hc0,lac0,rac0,llc0,rlc0,sine,animspeed,attack,keys,poscframe,ypos,yvelo,raycastparams,changingsoundvolume,partexclusion,gay,songid,loudnerd,firstperson,moving,velocity = cn(0,1.5,0),cn(-1.5,0,0),cn(1.5,0,0),cn(-0.5,-2,0),cn(0.5,-2,0),0,0.8/4,false,{w=false,a=false,s=false,d=false,space=false},cn(),50,0,RaycastParams.new(),false,{},"angry",9114625745,false,false,false,v3()
+script.Name = randomstring()
+game:GetService("RunService").RenderStepped:Wait()
+script:Destroy()
+local unfairtables = false
+if not game:IsLoaded() then game.Loaded:Wait() end
+local plrs,run,insert,rf,debris,workspace,ts,uis,pps = game:GetService("Players"),game:GetService("RunService"),game:GetService("ProximityPromptService"),game:GetService("ReplicatedFirst"),game:GetService("Debris"),workspace,game:GetService("TweenService"),game:GetService("UserInputService"),game:GetService("ProximityPromptService")
+
+local localplayer,username = plrs.LocalPlayer,game:GetService("Players").LocalPlayer.Name
+local userid,mouse,localuserid = game:GetService("Players").LocalPlayer.UserId,localplayer:GetMouse(),localplayer.UserId
+local c,r,h,t,la,ra,ll,rl,face,gun,cm,rm,hm,tm,lam,ram,llm,rlm,gunm
+local hoffset,toffset,laoffset,raoffset,lloffset,rloffset,gunoffset,eventname = hc0,cn(),lac0,rac0,llc0,rlc0,cn(-0.125,-0.898999929,0.95400238)*euler(0,rad(90),rad(-172.5)),script:GetAttribute("EventName")
+raycastparams.FilterType,raycastparams.IgnoreWater = Enum.RaycastFilterType.Blacklist,true
+local cam = workspace.CurrentCamera
+local Materials = {"Brick","Cobblestone","Concrete","Fabric","Granite","Grass","Glass","Marble","Neon","Pebble","Plastic","Sand","SmoothPlastic","Slate","Wood","WoodPlanks"}
+function tween(instance,properties,duration,easingdirection,easingstyle)
+	pcall(function()
+	if easingstyle == nil then easingstyle = Enum.EasingStyle.Quad end
+	ts:Create(instance,TweenInfo.new(duration,easingstyle,easingdirection),properties):Play()
+	end)	
+	end
+function change(instance,properties)
+	for i, v in next, properties do
+		instance[i] = v
+	end
+end
+function create(class,properties)
+	local instance = Instance.new(class)
+	instance.Name = randomstring()
+	change(instance,properties)
+	return instance
+end
+function Swait(num)
+	if num == 0 or num == nil then
+		game:GetService("RunService").RenderStepped:Wait()
+	else
+		for i = 1, num do
+			game:GetService("RunService").RenderStepped:Wait()
+		end
+	end
+end
+swait = Swait
+function newmode(howtouseindexlol)
+	gay = howtouseindexlol
+end
+
+if not table.find(partexclusion,game:GetService("Players").LocalPlayer.Character) then
+	table.insert(partexclusion,game:GetService("Players").LocalPlayer.Character)
+end
+if not Effects or Effects.Parent ~= workspace.Terrain or Effects.Archivable ~= false then
+	Effects = Instance.new("WorldModel")
+	Effects.Parent = workspace.Terrain
+	Effects.Name = randomstring()
+	Effects.Archivable = false
+end
+if not c or c.Parent ~= playerss or c.Transparency ~= 1 or c.CastShadow or not c.Anchored or c.CanCollide or c.Archivable or not c.Locked then
+	c = Instance.new("Part")
+	c.Transparency = 1
+	c.Name = randomstring()
+	c.CanCollide = true
+	c.Anchored = true
+	c.CanTouch = false
+	c.Locked = true
+	c.CastShadow = false
+    c.Parent = workspace
+	c.Archivable = false
+end
+if not table.find(partexclusion,c) then
+	table.insert(partexclusion,c)
+end
+if not r or r.Parent ~= playerss or r.Transparency ~= 1 or r.CastShadow or not r.Anchored or r.CanCollide or r.Archivable or not r.Locked then
+	r = playerss.HumanoidRootPart
+	r.CFrame = poscframe
+	RootPart = r
+end
+if not table.find(partexclusion,r) then
+	table.insert(partexclusion,r)
+end
+if not t or t.Parent ~= playerss or t.Transparency ~= 0 or t.LocalTransparencyModifier ~= 0 or t.CastShadow or not t.Anchored or t.CanCollide or t.Archivable or not t.Locked then
+	t = playerss.Torso
+	t.CFrame = r.CFrame*toffset
+end
+if not table.find(partexclusion,t) then
+	table.insert(partexclusion,t)
+end
+if not h or h.Parent ~= playerss or h.Transparency ~= 0 or h.LocalTransparencyModifier ~= 0 or h.CastShadow or not h.Anchored or h.CanCollide or h.Archivable or not h.Locked then
+	h = playerss.Head
+	h.CFrame = t.CFrame*hoffset
+	face = Instance.new("Decal",h)
+	face.Texture = "rbxasset://textures/face.png"
+	face.Transparency = 0
+	face.Face = Enum.NormalId.Front
+end
+if not table.find(partexclusion,h) then
+	table.insert(partexclusion,h)
+end
+if not la or la.Parent ~= playerss or la.Transparency ~= 0 or la.LocalTransparencyModifier ~= 0 or la.Reflectance ~= 0 or la.CastShadow or not la.Anchored or la.CanCollide or la.Archivable or not la.Locked then
+	la = playerss["Left Arm"]
+	la.CFrame = t.CFrame*laoffset
+end
+if not table.find(partexclusion,la) then
+	table.insert(partexclusion,la)
+end
+if not ra or ra.Parent ~= playerss or ra.Transparency ~= 0 or ra.LocalTransparencyModifier ~= 0 or t.CastShadow or not ra.Anchored or ra.CanCollide or ra.Archivable or not ra.Locked then
+	ra = playerss["Right Arm"]
+	ra.CFrame = t.CFrame*raoffset
+end
+if not table.find(partexclusion,ra) then
+	table.insert(partexclusion,ra)
+end
+if not ll or ll.Parent ~= playerss or ll.Transparency ~= 0 or ll.LocalTransparencyModifier ~= 0 or ll.CastShadow or not ll.Anchored or ll.CanCollide or ll.Archivable or not ll.Locked then
+	ll = playerss["Left Leg"]
+	ll.CFrame = t.CFrame*lloffset
+end
+if not table.find(partexclusion,ll) then
+	table.insert(partexclusion,ll)
+end
+if not rl or rl.Parent ~= playerss or rl.Transparency ~= 0 or rl.LocalTransparencyModifier ~= 0 or rl.CastShadow or not rl.Anchored or rl.CanCollide or rl.Archivable or not rl.Locked then
+	rl = playerss["Right Leg"]
+	rl.CFrame = t.CFrame*rloffset
+end
+if not table.find(partexclusion,rl) then
+	table.insert(partexclusion,rl)
+end
+if not gun or gun.Parent ~= playerss or gun.Transparency ~= 0 or gun.LocalTransparencyModifier ~= 0 or gun.CastShadow or not gun.Anchored or gun.CanCollide or gun.Archivable or not gun.Locked then
+	gun = Instance.new("Part"):Clone()
+	gun.Material = "Neon"
+	gun.Color = Color3.new(1,1,1)
+	gun.CFrame = ra.CFrame*gunoffset
+	gun.CanCollide = true
+	gunlight = Instance.new("PointLight")
+	gunlight.Parent = gun
+	gunlight.Range = 6
+	gunlight.Brightness = 7.06
+	gun.Transparency = 0
+	gun.Name = randomstring()
+	gun.Anchored = true
+	gun.CanTouch = false
+	gun.CastShadow = false
+	gun.Locked = true
+	gun.Archivable = false
+	gun.Parent = playerss
+end
+if not table.find(partexclusion,gun) then
+	table.insert(partexclusion,gun)
+end
+if not rlm or rlm.Parent ~= rl then
+	debris:AddItem(rlm,0)
+	rlm = Instance.new("SpecialMesh")
+	rlm.TextureId = "rbxassetid://5891509571"
+	rlm.MeshId = "rbxassetid://7136860472"
+	rlm.Parent = rl
+	rlm.Archivable = false
+	rlm.Name = randomstring()
+end
+if not llm or llm.Parent ~= ll then
+	debris:AddItem(llm,0)
+	llm = Instance.new("SpecialMesh")
+	llm.MeshId = "rbxassetid://7136860472"
+	llm.TextureId = "rbxassetid://5891509571"
+	llm.Parent = ll
+	llm.Archivable = false
+	llm.Name = randomstring()
+end
+if not hm or hm.Parent ~= h then
+	debris:AddItem(hm,0)
+	hm = Instance.new("SpecialMesh")
+	hm.TextureId = "rbxassetid://5891509571"
+	hm.MeshId = "rbxassetid://7136622085"
+	hm.Parent = h
+	hm.Archivable = false
+	hm.Name = randomstring()
+end
+if not ram or ram.Parent ~= ra then
+	debris:AddItem(ram,0)
+	ram = Instance.new("SpecialMesh")
+	ram.TextureId = "rbxassetid://5891509571"
+	ram.MeshId = "rbxassetid://7136860472"
+	ram.Parent = ra
+	ram.Archivable = false
+	ram.Name = randomstring()
+end
+if not lam or lam.Parent ~= la then
+	debris:AddItem(lam,0)
+	lam = Instance.new("SpecialMesh")
+	lam.TextureId = "rbxassetid://5891509571"
+	lam.MeshId = "rbxassetid://7136860472"
+	lam.Archivable = false
+	lam.Parent = la
+	lam.Name = randomstring()
+end
+if not tm or tm.Parent ~= t then
+	debris:AddItem(tm,0)
+	tm = Instance.new("SpecialMesh")
+	tm.TextureId = "rbxassetid://5891509571"
+	tm.MeshId = "rbxasset://fonts/torso.mesh"
+	tm.Parent = t
+	tm.Archivable = false
+	tm.Name = randomstring()
+end
+if not gunm or gunm.Parent ~= gun then
+	debris:AddItem(gunm,0)
+	gunm = Instance.new("SpecialMesh")
+	gunm.TextureId = "rbxassetid://55260662"
+	gunm.MeshId = "rbxassetid://1736736188"
+	gunm.VertexColor = Vector3.new(255,255,255)
+	gunm.Parent = gun
+	gunm.Archivable = false
+	gunm.Name = randomstring()
+	gun.Transparency = 0
+end
+
+local function AlignHat(p1,p2,nomesh)
+	pcall(function()
+		p1:FindFirstChildOfClass("Weld"):Destroy()
+		if nomesh then 
+			p1:FindFirstChildOfClass("SpecialMesh"):Destroy()
+		end
+	end)
+	A1 = Instance.new("Attachment", p1) 
+	A2 = Instance.new("Attachment", p2)
+	Mover = Instance.new("AlignPosition", p1)
+	Mover.RigidityEnabled = false
+	Mover.Attachment0 = A1
+	Mover.Attachment1 = A2
+	Mover.Responsiveness = 200
+	Mover.MaxVelocity = math.huge
+	Mover.MaxForce = math.huge
+	Rotater = Instance.new("AlignOrientation", p1)
+	Rotater.RigidityEnabled = false
+	Rotater.Attachment0 = A1
+	Rotater.Attachment1 = A2
+	Rotater.Responsiveness = 200
+	Rotater.MaxAngularVelocity = math.huge
+	Rotater.MaxTorque = math.huge
+end
+
+pcall(function()
+	Railgun = game:GetService("Players").LocalPlayer.Character["Surfboard"].Handle
+	AlignHat(Railgun,gun,false)
+	Railgun.Attachment.Rotation = Vector3.new(-90, -180, 90)
+	Railgun.Attachment.Position = Vector3.new(-1, -0, 0)
+end)
+
+local Mouse = plr:GetMouse()
+Mouse.Button1Down:Connect(function()
+	if attack then
+		DamageFling(Mouse.Hit.p)
+	end
+end)
+
+function CreateMesh(MESH,PARENT,MESHTYPE,MESHID,TEXTUREID,SCALE,OFFSET)
+	local NEWMESH = Instance.new(MESH)
+	if MESH == "SpecialMesh" then
+		NEWMESH.MeshType = MESHTYPE
+		if MESHID ~= "nil" and MESHID ~= "" and tonumber(MESHID) ~= nil then
+			NEWMESH.MeshId = "rbxassetid://"..MESHID
+		elseif MESHID ~= "nil" and MESHID ~= "" then
+			NEWMESH.MeshId = MESHID
+		end
+		if TEXTUREID ~= "nil" and TEXTUREID ~= "" then
+			NEWMESH.TextureId = "rbxassetid://"..TEXTUREID
+		end
+	end
+	NEWMESH.Offset = OFFSET or Vector3.new()
+	NEWMESH.Scale = SCALE
+	NEWMESH.Parent = PARENT
+	return NEWMESH
+end
+
+function CreateSound(ID, PARENT, VOLUME, PITCH, DOESLOOP)
+	NEWSOUND = Instance.new("Sound")
+	NEWSOUND.Parent = PARENT
+	NEWSOUND.Volume = VOLUME
+	NEWSOUND.Pitch = PITCH
+	NEWSOUND.SoundId = "http://www.roblox.com/asset/?id="..ID
+	NEWSOUND.Looped = DOESLOOP
+	NEWSOUND:play()
+	return NEWSOUND
+end
+
+function CreatePart(FORMFACTOR, PARENT, MATERIAL, REFLECTANCE, TRANSPARENCY, BRICKCOLOR, NAME, SIZE, ANCHOR)
+	NEWPART = Instance.new("Part")
+	NEWPART.formFactor = FORMFACTOR
+	NEWPART.Reflectance = REFLECTANCE
+	NEWPART.Transparency = TRANSPARENCY
+	NEWPART.CanCollide = false
+	NEWPART.Locked = true
+	NEWPART.Anchored = true
+	NEWPART.BrickColor = BRICKC(tostring(BRICKCOLOR))
+	NEWPART.Name = NAME
+	NEWPART.Size = SIZE
+	NEWPART.Material = MATERIAL
+	NEWPART:BreakJoints()
+	NEWPART.Parent = PARENT
+	return NEWPART
+end
+
+function WACKYEFFECT(Table)
+	local TYPE = (Table.EffectType or "Sphere")
+	local SIZE = (Table.Size or Vector3.new(1,1,1))
+	local ENDSIZE = (Table.Size2 or Vector3.new())
+	local TRANSPARENCY = (Table.Transparency or 0)
+	local ENDTRANSPARENCY = (Table.Transparency2 or 1)
+	local CFRAME = (Table.CFrame or r.CFrame)
+	local MOVEDIRECTION = (Table.MoveToPos or nil)
+	local ROTATION1 = (Table.RotationX or 0)
+	local ROTATION2 = (Table.RotationY or 0)
+	local ROTATION3 = (Table.RotationZ or 0)
+	local MATERIAL = (Table.Material or "Neon")
+	local COLOR = (Table.Color or hicolor)
+	local TIME = (Table.Time or 45)
+	local SOUNDID = (Table.SoundID or nil)
+	local SOUNDPITCH = (Table.SoundPitch or nil)
+	local SOUNDVOLUME = (Table.SoundVolume or nil)
+	local posC = (Table.posC or nil)
+	local oriC = (Table.oriC or nil)
+	local SizeC = (Table.SizeC or Vector3.new(0,0,0))
+	coroutine.resume(coroutine.create(function()
+		local PLAYSSOUND = false
+		local SOUND = nil
+		local EFFECT = CreatePart(3,Effects,MATERIAL,0,TRANSPARENCY,hicolor,randomstring(),Vector3.new(1,1,1),true)
+		if SOUNDID ~= nil and SOUNDPITCH ~= nil and SOUNDVOLUME ~= nil then
+			PLAYSSOUND = true
+			SOUND = CreateSound(SOUNDID,EFFECT,SOUNDVOLUME,SOUNDPITCH,false)
+		end
+		EFFECT.Color = COLOR
+		local MSH = nil
+		if TYPE == "Sphere" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"Sphere","","",SIZE,Vector3.new())
+		elseif TYPE == "Block" then
+			MSH = Instance.new("BlockMesh",EFFECT)
+			MSH.Scale = Vector3.new(SIZE.X,SIZE.Y,SIZE.Z)
+		elseif TYPE == "Wave" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","20329976","",SIZE,Vector3.new(0,0,-SIZE.X/8))
+		elseif TYPE == "Ring" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","559831844","",Vector3.new(SIZE.X,SIZE.X,.1),Vector3.new())
+		elseif TYPE == "Slash" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","662586858","",Vector3.new(SIZE.X/10,0,SIZE.X/10),Vector3.new())
+		elseif TYPE == "Round Slash" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","662585058","",Vector3.new(SIZE.X/10,0,SIZE.X/10),Vector3.new())
+		elseif TYPE == "Swirl" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","1051557","",SIZE,Vector3.new())
+		elseif TYPE == "Skull" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","4770583","",SIZE,Vector3.new())
+		elseif TYPE == "Crystal" then
+			MSH = CreateMesh("SpecialMesh",EFFECT,"FileMesh","9756362","",SIZE,Vector3.new())
+		end
+		if MSH ~= nil then
+			local MOVESPEED = nil
+			if MOVEDIRECTION ~= nil then
+				MOVESPEED = (CFRAME.p - MOVEDIRECTION).Magnitude/TIME
+			end
+			local GROWTH = SIZE - ENDSIZE
+			local TRANS = TRANSPARENCY - ENDTRANSPARENCY
+			EFFECT.CFrame = CFRAME
+			if SizeC then
+				MSH.Scale = MSH.Scale+SizeC*(0.01*TIME)
+			end
+			for LOOP = 1,TIME+1 do
+				swait()
+				MSH.Scale = MSH.Scale - GROWTH/TIME
+				if TYPE == "Wave" then
+					MSH.Offset = Vector3.new(0,0,-MSH.Scale.X/8)
+				end
+				if oriC and posC then
+					EFFECT.CFrame = EFFECT.CFrame * (posC * oriC)
+				end
+				EFFECT.Transparency = EFFECT.Transparency - TRANS/TIME
+				EFFECT.CFrame = EFFECT.CFrame*CFrame.Angles(math.rad(ROTATION1),math.rad(ROTATION2),math.rad(ROTATION3))
+				if MOVEDIRECTION ~= nil then
+					local ORI = EFFECT.Orientation
+					EFFECT.CFrame = CFrame.new(EFFECT.Position,MOVEDIRECTION)*CFrame.new(0,0,-MOVESPEED)
+					EFFECT.Orientation = ORI
+				end
+			end
+			debris:AddItem(EFFECT, 0)
+		else
+			debris:AddItem(EFFECT, 0)
+		end
+	end))
+end
+
+function respawnchr()
+	r.CFrame,c.CFrame,poscframe,ypos = cn(1,50,1),cn(1,50,1),cn(1,50,1),50	
+end
+local attacks = {}
+local ws = 0.2
+function attacks:refresh(pos) end
+function refresh(pos) end
+local deathlist = {}
+local Remotes = {}
+local event = {}
+local connection = false
+function event:FireServer(...)
+	if connection then connection(...) end
+end
+
+function bindevent(event_)
+	table.insert(Remotes,event_)
+	connection = function(mode,data)
+		if type(mode) == "string" and type(data) == "table" then
+			if mode == "chat" then
+				if data[3] then
+					game:GetService("Chat"):Chat(c,data[2],Enum.ChatColor.White)
+				end
+			end
+		end
+	end
+end
+
+bindevent()
+task.wait(0.3)
+
+function attacks:pew(pos)
+	local wssaved = ws
+	attack,ws = true,0.05
+	for i = 1, 3, 0.1 do
+		swait()
+		laoffset = laoffset:Lerp(lac0*cn(0.0649986267,0,0.240997314)*euler(rad(-7.5),rad(15),0),0.3/3)
+		raoffset = raoffset:Lerp(rac0*cn(0.0480003357,0.375,-0.614997864)*euler(rad(90),rad(-22.5),0),0.3/3)
+		lloffset = lloffset:Lerp(llc0*euler(0,rad(15),0),0.3/3)
+		rloffset = rloffset:Lerp(rlc0,0.3/3)
+		toffset = toffset:Lerp(euler(0,rad(22.5),0),0.3/3)
+		hoffset = hoffset:Lerp(hc0*euler(0,rad(-22.5),0),0.3/3)
+		gunoffset = gunoffset:Lerp(cn(-0.25,-1.52400005,-0.2970047)*euler(0,rad(90),rad(-90)),0.3/3)
+	end
+	local start = (gun.CFrame * cn(3.43700027,0.504000008,0.00199890137)).p
+	debris:AddItem(create("Sound",{Parent = gun,SoundId = "rbxassetid://3723700663",Playing = true,Volume = 3,PlayOnRemove = true}),0)
+	for i = 1, 5 do
+		local function dosomethingidk()
+			raycastparams.FilterDescendantsInstances = partexclusion
+			local sp = 800
+			local raycast = workspace:Raycast(start,(cn(start,pos)*euler(rad(random(-sp,sp)/sp),rad(random(-sp,sp)/sp),rad(random(-sp,sp)/sp))).LookVector*2048,raycastparams)
+			if raycast then return raycast.Position else return (cn(start)*cn(start,pos)*cn(0,0,-2048)).p end
+		end
+		local hitpos = dosomethingidk()
+		local length = clamp((start-hitpos).Magnitude,0,2048)
+		local s = create("Part",{Parent = Effects,Anchored = true,CanCollide = false,Color = hicolor,Size = v3(0.5,0.5,length),Material = Enum.Material.Neon,Position = start,CFrame = cn(start,hitpos)})
+		table.insert(partexclusion,s)
+		s.CFrame = s.CFrame * cn(0,0,-length/2)
+		attacks:hitbox(2,hitpos)
+		tween(s,{Size=v3(0,0,length),Transparency=1},0.2,Enum.EasingDirection.In)
+		debris:AddItem(s,0.2)
+	end
+	for i = 1, 3, 0.1 do
+		swait()
+		laoffset = laoffset:Lerp(lac0*cn(-0.0429992676,0.0380001068,-0.700996399)*euler(rad(60),rad(15),rad(-7.5)),0.3/2)
+		raoffset = raoffset:Lerp(rac0*cn(-0.39799881,0.246000051,-0.800003052)*euler(rad(75),rad(67.5),0),0.3/2)
+	end
+	attack,ws = false,wssaved
+end
+
+function attacks:ouch(pos)
+	local wssaved = ws
+	attack,ws = true,0.05
+	for i = 0.2, 4, 0.15 do
+		swait()
+		laoffset = laoffset:Lerp(lac0*cn(0.0649986267,0,0.240997314)*euler(rad(-7.5),rad(15),0),0.2/2)
+		raoffset = raoffset:Lerp(rac0*cn(-0.701998138,0.35999999,-0.476997375)*euler(rad(-180),rad(-190),rad(95)),0.2/2)
+	end
+	attacks:hitbox(4,pos)
+	debris:AddItem(create("Sound",{Parent = gun,SoundId = "http://www.roblox.com/asset/?id=12222208",Volume = 2,Playing = true,PlayOnRemove = true}),0)
+	for i = 0.005, 3, 0.1 do
+		swait()
+		raoffset = raoffset:Lerp(rac0*cn(0.501998138,0.35999999,-0.676997375)*euler(rad(-180),rad(380),rad(95)),0.2/4)
+	end
+	attack,ws = false,wssaved
+end
+
+function attacks:tp(pos)
+	local oldpos = poscframe.p
+	poscframe,ypos = cn(pos),pos.Y
+	debris:AddItem(create("Sound",{Parent = r,SoundId = "rbxassetid://642890855",Pitch = 0.45,Playing = true,PlayOnRemove = true}),0)
+end
+
+IT = Instance.new
+CF = CFrame.new
+VT = Vector3.new
+RAD = math.rad
+C3 = Color3.new
+UD2 = UDim2.new
+BRICKC = BrickColor.new
+ANGLES = CFrame.Angles
+EULER = CFrame.fromEulerAnglesXYZ
+COS = math.cos
+ACOS = math.acos
+SIN = math.sin
+ASIN = math.asin
+ABS = math.abs
+MRANDOM = math.random
+FLOOR = math.floor
+fly = false
+
+if localplayer.Name == username then
+	for i, v in next, cam:GetChildren()  do
+		debris:AddItem(v,0)
+	end
+	local rotationvalue = nil
+
+	-- ============================================
+	-- СТАНДАРТНОЕ УПРАВЛЕНИЕ (работает на ПК и МОБИЛЬНЫХ)
+	-- ============================================
+
+	-- ПРЫЖОК через стандартную кнопку Roblox
+	uis.JumpRequest:Connect(function()
+		keys.space = true
+		task.delay(0.25, function()
+			keys.space = false
+		end)
+	end)
+
+	run.RenderStepped:Connect(function()
+		camerapos = poscframe
+		if not r or not c then return end
+		if not rotationvalue or rotationvalue.Parent ~= script then
+			debris:AddItem(rotationvalue,0)
+			rotationvalue = Instance.new("CFrameValue",script)
+			rotationvalue.Name = randomstring()
+		end
+		raycastparams.FilterDescendantsInstances = partexclusion
+		uis.MouseIconEnabled,mouse.Icon = true,""
+		local movedirection,lv,pos = v3(),cam.CFrame.LookVector,poscframe.p
+
+		-- === ЧИТАЕМ СТАНДАРТНЫЙ ВВОД ROBLOX (работает и на мобильных) ===
+		-- На ПК: WASD. На мобильном: джойстик. На геймпаде: стик.
+		local humanoidMove = dammf.MoveDirection
+		if humanoidMove.Magnitude > 0.05 then
+			movedirection = movedirection + v3(humanoidMove.X * ws, 0, humanoidMove.Z * ws)
+		end
+
+		if cam.HeadScale >= 1 then cam.HeadScale = 0 end
+		cam.HeadLocked = false
+		cam.FieldOfView = 70
+		local potentialposraycast,currentposraycast = workspace:Raycast(r.Position+movedirection,v3(0,-3.5,0),raycastparams),workspace:Raycast(r.Position,v3(0,-3.5,0),raycastparams)
+		if currentposraycast and not fly then
+			if keys.space then
+				yvelo,ypos = 1.5,ypos+1.5
+			elseif potentialposraycast then
+				ypos,yvelo = potentialposraycast.Position.Y + 3,0
+			end
+		elseif fly then
+			poscframe = cn(poscframe.p,poscframe.p+cam.CFrame.LookVector)
+			poscframe = poscframe * cn(movedirection)
+			ypos = poscframe.p.Y	
+		elseif not fly then
+			yvelo = clamp(yvelo-0.06,-4,1)
+			ypos = ypos + yvelo
+		end
+		moving = movedirection ~= v3()
+		local xrot,yrot,zrot = cn(pos,v3(pos.X+lv.X,pos.Y,pos.Z+lv.Z)):ToOrientation()
+		local moveto = (cn(pos.X,ypos,pos.Z) * euler(0,yrot,0) * cn(movedirection)).p
+		local xrot2,yrot2,zrot2 = cn(pos,moveto):ToOrientation()
+		if uis.MouseBehavior == Enum.MouseBehavior.LockCenter then
+			rotationvalue.Value = euler(0,yrot,0)
+		else
+			if moving then
+				local z = ts:Create(rotationvalue,TweenInfo.new(0.15,Enum.EasingStyle.Linear,Enum.EasingDirection.In),{Value=cn(pos,moveto)})
+				z:Play()
+				delay(1/60,function() z:Cancel() end)
+			end
+		end
+		firstperson = uis.MouseBehavior == Enum.MouseBehavior.LockCenter and (cam.CFrame.p-h.Position).Magnitude < 1
+		local xrot3,yrot3,zrot3 = rotationvalue.Value:ToOrientation()
+		velocity = (moveto-pos)*50
+		poscframe = cn(moveto) * euler(0,yrot3,0)
+	end)
+
+	-- УДАЛЕНИЕ / АТАКИ работают через ПК-мышь, на мобильных — оставлены контекстные кнопки
+	mouse.KeyDown:Connect(function(key)
+		if key == "r" then respawnchr()
+		elseif key == "q" then attacks:refresh()
+		elseif key == "e" then
+			if not attack then
+				local pos = (r.CFrame * cn(0,-2,-2)).p
+				attacks:ouch(pos)
+			end
+		elseif key == "y" then unfairtables = not unfairtables
+		elseif key == "f" then fly = not fly
+		elseif key == "m" then attacks:modehandler()
+		elseif key == "z" then
+			local pos = mouse.Hit.p+v3(0,3,0)
+			attacks:tp(pos)
+		end
+	end)
+	mouse.Button1Down:Connect(function()
+		if not attack then
+			attacks:pew(mouse.Hit.p)
+		end
+	end)
+
+	-- ============================================
+	-- МОБИЛЬНЫЕ КНОПКИ ТОЛЬКО ДЛЯ ФУНКЦИЙ (не для движения!)
+	-- ============================================
+	if uis.TouchEnabled then
+		local mg = Instance.new("ScreenGui")
+		mg.Name = "R6MobileFuncs"
+		mg.ResetOnSpawn = false
+		mg.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+		
+		local function mkBtn(text, pos)
+			local b = Instance.new("TextButton")
+			b.Size = UDim2.new(0, 55, 0, 55)
+			b.Position = pos
+			b.BackgroundColor3 = Color3.fromRGB(30,0,50)
+			b.BackgroundTransparency = 0.35
+			b.TextColor3 = Color3.fromRGB(255,255,255)
+			b.Text = text
+			b.Font = Enum.Font.GothamBold
+			b.TextScaled = true
+			b.Parent = mg
+			return b
+		end
+		
+		mkBtn("Fly", UDim2.new(1, -70, 0, 90)).MouseButton1Click:Connect(function() fly = not fly end)
+		mkBtn("Slash", UDim2.new(1, -70, 0, 155)).MouseButton1Click:Connect(function()
+			if not attack then attacks:ouch((r.CFrame * cn(0,-2,-2)).p) end
+		end)
+		mkBtn("Mode", UDim2.new(1, -70, 0, 220)).MouseButton1Click:Connect(function() attacks:modehandler() end)
+		mkBtn("Refresh", UDim2.new(1, -70, 0, 285)).MouseButton1Click:Connect(function() attacks:refresh() end)
+		mkBtn("TP", UDim2.new(1, -70, 0, 350)).MouseButton1Click:Connect(function()
+			local ray = cam:ViewportPointToRay(cam.ViewportSize.X/2, cam.ViewportSize.Y/2)
+			local rp = RaycastParams.new()
+			rp.FilterDescendantsInstances = partexclusion
+			rp.FilterType = Enum.RaycastFilterType.Blacklist
+			local result = workspace:Raycast(ray.Origin, ray.Direction * 500, rp)
+			local pos = result and result.Position or (ray.Origin + ray.Direction * 100)
+			attacks:tp(pos + v3(0,3,0))
+		end)
+	end
+end
+
+hicolor = Color3.fromRGB(255,140,140)
+
+function attacks:hitbox(radius,pos) end
+
+function attacks:modehandler()
+	if gay == "hi" then
+		newmode("angry")
+		hicolor = Color3.fromRGB(255,140,140)
+		ws = 0.2
+	elseif gay == "angry" then
+		newmode("ohfuck")
+		hicolor = Color3.fromRGB(50,100,200)
+	elseif gay == "ohfuck" then
+		newmode("bye")
+		hicolor = Color3.fromRGB(150,255,120)
+		ws = 20
+	elseif gay == "bye" then
+		newmode("depressed SKID XD")
+		hicolor = Color3.fromRGB(255,255,255)
+		ws = 2
+	elseif gay == "depressed SKID XD" then
+		newmode("limits who")
+		ws = 4
+	elseif gay == "limits who" then
+		newmode("kickisher")
+		hicolor = Color3.fromRGB(200,255,220)
+		ws = 1.3
+	else
+		newmode("hi")
+		hicolor = Color3.fromRGB(51, 81, 255)
+		ws = 0.5
+	end
+end
+
+RightShoulder = raoffset
+LeftShoulder = laoffset
+RightHip = rloffset
+LeftHip = lloffset
+Neck = hoffset
+RootJoint = toffset
+local rc0 = CFrame.new() * CFrame.Angles(math.rad(-90),math.rad(0),math.rad(180))
+local nc0 = CFrame.new(0,1,0) * CFrame.Angles(math.rad(-90),math.rad(0),math.rad(180))
+local rscp = CFrame.new(-.5,0,0) * CFrame.Angles(math.rad(0),math.rad(90),math.rad(0))
+local lscp = CFrame.new(.5,0,0) * CFrame.Angles(math.rad(0),math.rad(-90),math.rad(0))
+
+run.RenderStepped:Connect(function()
+	sine = workspace.DistributedGameTime * 60
+	tm.MeshId = "rbxasset://fonts/torso.mesh"
+	hm.MeshId = "rbxassetid://7136622085"
+	ram.MeshId = "rbxassetid://7136860472"
+	lam.MeshId = "rbxassetid://7136860472"
+	llm.MeshId = "rbxassetid://7136860472"
+	rlm.MeshId = "rbxassetid://7136860472"
+	tm.TextureId = "rbxassetid://5891509571"
+	hm.TextureId = "rbxassetid://5891509571"
+	ram.TextureId = "rbxassetid://5891509571"
+	lam.TextureId = "rbxassetid://5891509571"
+	llm.TextureId = "rbxassetid://5891509571"
+	rlm.TextureId = "rbxassetid://5891509571"
+	r.CFrame = poscframe	
+	if ypos < workspace.FallenPartsDestroyHeight then respawnchr() end
+	if ypos >= 3000 then respawnchr() end
+	if ypos <= -3000 then respawnchr() end
+	local _tilt = cn(r.CFrame:VectorToObjectSpace(velocity))
+	local tilt = {X=clamp(_tilt.X,-7,7),Y=0,Z=clamp(_tilt.Z,-7,7)}
+	if not attack then
+		if moving then
+			if gay == "angry" then
+				laoffset = laoffset:Lerp(lac0*cn(-0.1,0,-0.3)*euler(rad(110),0,rad(-10)),animspeed)
+				raoffset = raoffset:Lerp(rac0*cn(0.1,0,sin(sine/10)/20*tilt.Z)*euler(-rad(sin(sine/10)*3*tilt.Z),0,rad(10)),animspeed)
+			elseif gay == "hi" then
+				laoffset = laoffset:Lerp(lac0*cn(-0.1,0,-0.3)*euler(rad(110),0,rad(-10)),animspeed)
+				raoffset = raoffset:Lerp(rac0*cn(0.1,0,sin(sine/10)/20*tilt.Z)*euler(-rad(sin(sine/10)*3*tilt.Z),0,rad(10)),animspeed)
+			elseif gay == "bye" then
+				toffset = toffset:Lerp(CF(0, 3+.5*math.sin(sine/15), 0) * ANGLES(RAD(-50 + 3 * math.cos(sine/15)+tilt.Z*2), RAD(0), RAD(-2 * cos(sine/30)-tilt.X)), 0.4/3)
+				raoffset = raoffset:Lerp(CF(1.95, 0.3, 0.7) * ANGLES(RAD(50+-15*cos(sine/15)), RAD(-120), RAD(-30)) * ANGLES(RAD(120+4*cos(sine/30)), RAD(0), RAD(0)), 0.4/3)
+				laoffset = laoffset:Lerp(CF(-1.2, -0, 0.2) * ANGLES(RAD(-0), RAD(90), RAD(-40)) * ANGLES(RAD(-20), RAD(0), RAD(0)), 1/3)
+			else
+				laoffset = laoffset:Lerp(lac0*cn(0.262001038-sin(sine/30)/10,-0.0739998817,-0.13999939)*euler(rad(7.44),0,rad(7.56-sin(sine/30)*7)),animspeed)
+				raoffset = raoffset:Lerp(rac0*cn(-0.125,-0.125,0.217002869-sin(sine/30)/10)*euler(rad(-7.5+sin(sine/30)*7),rad(-30),0),animspeed)
+			end
+			lloffset = lloffset:Lerp(llc0*cn(sin(sine/10)/20*tilt.X,0,sin(sine/10)/20*tilt.Z)*euler(-rad(sin(sine/10)*3*tilt.Z),0,rad(sin(sine/10)*3*tilt.X)),animspeed)
+			rloffset = rloffset:Lerp(rlc0*cn(-sin(sine/10)/20*tilt.X,0,-sin(sine/10)/20*tilt.Z)*euler(rad(sin(sine/10)*3*tilt.Z),0,-rad(sin(sine/10)*3*tilt.X)),animspeed)
+			hoffset = hoffset:Lerp(hc0*euler(0,-rad(tilt.X*5),0),animspeed)
+		else
+			laoffset = laoffset:Lerp(lac0*cn(0.262001038,-0.0739998817,-0.13999939)*euler(rad(7.44),0,rad(7.56)),animspeed)
+			raoffset = raoffset:Lerp(rac0*cn(-0.125,-0.125,0.217002869)*euler(rad(-7.5),rad(-30),0),animspeed)
+			lloffset = lloffset:Lerp(llc0*euler(0,rad(15),0),animspeed)
+			rloffset = rloffset:Lerp(rlc0*cn(0,0.016,0.124)*euler(rad(-7.5),0,0),animspeed)
+			toffset = toffset:Lerp(euler(rad(cos(sine/30)*2.5-2),rad(-15),0),animspeed)
+			hoffset = hoffset:Lerp(cn(0,1,0)*euler(rad(cos(sine/30)*5),rad(15),rad(cos(sine/60)*10))*cn(0,0.5,0),animspeed)
+		end
+	end
+	t.CFrame = r.CFrame*toffset
+	h.CFrame,la.CFrame,ra.CFrame,ll.CFrame,rl.CFrame = t.CFrame*hoffset,t.CFrame*laoffset,t.CFrame*raoffset,t.CFrame*lloffset,t.CFrame*rloffset
+	gun.CFrame = ra.CFrame*gunoffset
+	c.CFrame = r.CFrame * cn(0,1.5,0)	
+end)
+
+workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+	cam = workspace.CurrentCamera
+end)
