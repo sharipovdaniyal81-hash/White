@@ -1,3 +1,4 @@
+
 -- Spider Project Panel — styled after Infinite Yield
 if getgenv().SPIDERPROJECT_LOADED and not getgenv().SPIDERPROJECT_DEBUG then
 	return
@@ -16,7 +17,6 @@ local gethui = missing("function", gethui or get_hidden_gui)
 local syn_protect_gui = missing("function", syn and syn.protect_gui)
 local getcustomasset = missing("function", getcustomasset or getsynasset)
 local writefile = missing("function", writefile)
-local readfile = missing("function", readfile)
 local isfile = missing("function", isfile)
 local makefolder = missing("function", makefolder)
 local isfolder = missing("function", isfolder)
@@ -42,7 +42,6 @@ local Services = setmetatable({}, {
 local Players = Services.Players
 local UserInputService = Services.UserInputService
 local TweenService = Services.TweenService
-local RunService = Services.RunService
 
 local COREGUI = Services.CoreGui or Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui")
 local PlayerGui = cloneref(Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui"))
@@ -54,9 +53,7 @@ local PANEL_NAME = "Spider Project"
 local assets = {
 	["spiderproject/assets/close.png"]        = "rbxassetid://5054663650",
 	["spiderproject/assets/settings.png"]     = "rbxassetid://1204397029",
-	["spiderproject/assets/minimize.png"]     = "rbxassetid://2406617031",
 	["spiderproject/assets/logo.png"]         = "rbxassetid://1352543873",
-	["spiderproject/assets/edittheme.png"]    = "rbxassetid://4911962991",
 	["spiderproject/assets/editkeybinds.png"] = "rbxassetid://129697930",
 }
 
@@ -201,19 +198,30 @@ Cmdbar.Text = ""
 Cmdbar.PlaceholderText = "Command Bar"
 Cmdbar.ZIndex = 10
 
--- Command list scroller
+-- Divider under cmdbar
+local Divider = Instance.new("Frame")
+Divider.Name = "Divider"
+Divider.Parent = Holder
+Divider.BackgroundColor3 = Color3.fromRGB(78, 78, 79)
+Divider.BorderSizePixel = 0
+Divider.Position = UDim2.new(0, 5, 0, 44)
+Divider.Size = UDim2.new(0, 240, 0, 1)
+Divider.ZIndex = 10
+table.insert(shade3, Divider)
+
+-- Command list scroller (LIST ONLY, no buttons)
 local CMDsF = Instance.new("ScrollingFrame")
 CMDsF.Name = "CMDs"
 CMDsF.Parent = Holder
 CMDsF.BackgroundTransparency = 1
 CMDsF.BorderSizePixel = 0
-CMDsF.Position = UDim2.new(0, 5, 0, 45)
-CMDsF.Size = UDim2.new(0, 245, 0, 175)
+CMDsF.Position = UDim2.new(0, 5, 0, 46)
+CMDsF.Size = UDim2.new(0, 245, 0, 174)
 CMDsF.ScrollBarImageColor3 = Color3.fromRGB(78, 78, 79)
 CMDsF.BottomImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
 CMDsF.CanvasSize = UDim2.new(0, 0, 0, 0)
 CMDsF.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
-CMDsF.ScrollBarThickness = 8
+CMDsF.ScrollBarThickness = 6
 CMDsF.TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
 CMDsF.VerticalScrollBarInset = "Always"
 CMDsF.ZIndex = 10
@@ -221,6 +229,14 @@ table.insert(scroll, CMDsF)
 
 local cmdListLayout = Instance.new("UIListLayout")
 cmdListLayout.Parent = CMDsF
+cmdListLayout.Padding = UDim.new(0, 1)
+cmdListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local cmdPadding = Instance.new("UIPadding")
+cmdPadding.Parent = CMDsF
+cmdPadding.PaddingTop = UDim.new(0, 2)
+cmdPadding.PaddingLeft = UDim.new(0, 2)
+cmdPadding.PaddingRight = UDim.new(0, 2)
 
 -- Settings button
 local SettingsButton = Instance.new("ImageButton")
@@ -232,7 +248,7 @@ SettingsButton.Size = UDim2.new(0, 20, 0, 20)
 SettingsButton.Image = customAsset("spiderproject/assets/settings.png")
 SettingsButton.ZIndex = 10
 
--- Intro logo
+-- Intro overlay
 local IntroBackground = Instance.new("Frame")
 IntroBackground.Name = "IntroBackground"
 IntroBackground.Parent = Holder
@@ -241,7 +257,7 @@ IntroBackground.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
 IntroBackground.BorderSizePixel = 0
 IntroBackground.Position = UDim2.new(0, 0, 0, 45)
 IntroBackground.Size = UDim2.new(0, 250, 0, 175)
-IntroBackground.ZIndex = 10
+IntroBackground.ZIndex = 20
 
 local Logo = Instance.new("ImageLabel")
 Logo.Name = "Logo"
@@ -251,22 +267,20 @@ Logo.BorderSizePixel = 0
 Logo.Position = UDim2.new(0, 125, 0, 127)
 Logo.Size = UDim2.new(0, 10, 0, 10)
 Logo.Image = customAsset("spiderproject/assets/logo.png")
-Logo.ZIndex = 10
+Logo.ZIndex = 21
 
--- Intro title text over logo
 local IntroText = Instance.new("TextLabel")
 IntroText.Name = "IntroText"
 IntroText.Parent = Holder
 IntroText.BackgroundTransparency = 1
 IntroText.BorderSizePixel = 0
-IntroText.Position = UDim2.new(0, 0, 0, 175)
+IntroText.Position = UDim2.new(0, 0, 0, 178)
 IntroText.Size = UDim2.new(0, 250, 0, 25)
 IntroText.Font = Enum.Font.SourceSansBold
 IntroText.TextSize = 20
 IntroText.Text = PANEL_NAME
 IntroText.TextColor3 = Color3.new(1, 1, 1)
-IntroText.TextTransparency = 0
-IntroText.ZIndex = 10
+IntroText.ZIndex = 21
 table.insert(text1, IntroText)
 
 -- Credits
@@ -281,7 +295,7 @@ Credits.Font = Enum.Font.SourceSansLight
 Credits.TextSize = 14
 Credits.Text = PANEL_NAME
 Credits.TextColor3 = Color3.new(1, 1, 1)
-Credits.ZIndex = 10
+Credits.ZIndex = 22
 table.insert(text1, Credits)
 
 -- Intro animation
@@ -298,7 +312,7 @@ do
 	end)
 end
 
--- ============ COMMAND SYSTEM ============
+-- ============ COMMANDS ============
 local commands = {
 	{
 		Name = "spiderbot",
@@ -309,67 +323,73 @@ local commands = {
 	}
 }
 
-local cmdListFrame = Instance.new("Frame")
-cmdListFrame.Name = "cmds"
-cmdListFrame.Parent = Holder
-cmdListFrame.BackgroundTransparency = 1
-cmdListFrame.Position = UDim2.new(0, 5, 0, 90)
-cmdListFrame.Size = UDim2.new(0, 240, 0, 130)
-cmdListFrame.ZIndex = 10
-
-local Example = Instance.new("TextButton")
-Example.Name = "Example"
-Example.Parent = cmdListFrame
-Example.BackgroundTransparency = 1
-Example.BorderSizePixel = 0
-Example.Size = UDim2.new(0, 240, 0, 20)
-Example.Text = ""
-Example.AutoButtonColor = false
-Example.ZIndex = 10
-Example.Visible = false
-
-local function newCmdEntry(text)
-	local new = Example:Clone()
-	new.Parent = cmdListFrame
-	new.Text = text
-	new.Visible = true
-	new.Name = text:gsub("%s", "")
-	new.ZIndex = 10
-	new.MouseEnter:Connect(function()
-		new.BackgroundTransparency = 0.7
-		new.BackgroundColor3 = Color3.fromRGB(78, 78, 79)
-	end)
-	new.MouseLeave:Connect(function()
-		new.BackgroundTransparency = 1
-	end)
-	new.MouseButton1Click:Connect(function()
-		new.Text = ""
-		if commands[1] then
-			pcall(commands[1].Function)
-		end
-		task.wait(0.5)
-		new.Text = text
-	end)
-	return new
-end
-
+-- ============ COMMAND LIST (visual only, labels) ============
+local listOrder = 1
 for _, cmd in ipairs(commands) do
-	newCmdEntry(cmd.Name)
+	-- Row container
+	local Row = Instance.new("Frame")
+	Row.Name = cmd.Name
+	Row.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+	Row.BackgroundTransparency = 0.35
+	Row.BorderSizePixel = 0
+	Row.Size = UDim2.new(1, -14, 0, 22)
+	Row.ZIndex = 10
+	Row.LayoutOrder = listOrder
+	Row.Parent = CMDsF
+	table.insert(shade2, Row)
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 3)
+	corner.Parent = Row
+
+	-- Small dot / bullet
+	local Bullet = Instance.new("Frame")
+	Bullet.Name = "Bullet"
+	Bullet.BackgroundColor3 = Color3.fromRGB(78, 78, 79)
+	Bullet.BorderSizePixel = 0
+	Bullet.Position = UDim2.new(0, 8, 0.5, -3)
+	Bullet.Size = UDim2.new(0, 6, 0, 6)
+	Bullet.ZIndex = 11
+	Bullet.Parent = Row
+	table.insert(shade3, Bullet)
+
+	local bulletCorner = Instance.new("UICorner")
+	bulletCorner.CornerRadius = UDim.new(1, 0)
+	bulletCorner.Parent = Bullet
+
+	-- Command name (non-clickable label)
+	local Name = Instance.new("TextLabel")
+	Name.Name = "Name"
+	Name.BackgroundTransparency = 1
+	Name.BorderSizePixel = 0
+	Name.Position = UDim2.new(0, 24, 0, 0)
+	Name.Size = UDim2.new(1, -28, 1, 0)
+	Name.Font = Enum.Font.SourceSans
+	Name.TextSize = 15
+	Name.Text = cmd.Name
+	Name.TextColor3 = Color3.new(1, 1, 1)
+	Name.TextXAlignment = Enum.TextXAlignment.Left
+	Name.ZIndex = 11
+	Name.Parent = Row
+	table.insert(text1, Name)
+
+	listOrder += 1
 end
 
 -- ============ COMMAND EXECUTION ============
 local function handleCommand(input)
 	if not input or input == "" then return end
+	input = input:gsub("^%s+", ""):gsub("%s+$", "")
 	for _, cmd in ipairs(commands) do
 		if cmd.Name:lower() == input:lower() then
 			local ok, err = pcall(cmd.Function)
 			if not ok then
-				warn("[Spider Project] command error:", err)
+				warn("[" .. PANEL_NAME .. "] command error:", err)
 			end
 			return
 		end
 	end
-	warn("[Spider Project] unknown command:", input)
+	warn("[" .. PANEL_NAME .. "] unknown command: " .. input)
 end
 
 Cmdbar.FocusLost:Connect(function(enterPressed)
