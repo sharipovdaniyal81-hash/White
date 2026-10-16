@@ -1,0 +1,424 @@
+-- Spider Project Panel — styled after Infinite Yield
+if getgenv().SPIDERPROJECT_LOADED and not getgenv().SPIDERPROJECT_DEBUG then
+	return
+end
+pcall(function() getgenv().SPIDERPROJECT_LOADED = true end)
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+-- ============ UTILITY / COMPAT ============
+local function missing(t, f, fallback)
+	if type(f) == t then return f end
+	return fallback
+end
+
+local cloneref = missing("function", cloneref, function(...) return ... end)
+local gethui = missing("function", gethui or get_hidden_gui)
+local syn_protect_gui = missing("function", syn and syn.protect_gui)
+local getcustomasset = missing("function", getcustomasset or getsynasset)
+local writefile = missing("function", writefile)
+local readfile = missing("function", readfile)
+local isfile = missing("function", isfile)
+local makefolder = missing("function", makefolder)
+local isfolder = missing("function", isfolder)
+local IsOnMobile = false
+pcall(function()
+	IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS},
+		game:GetService("UserInputService"):GetPlatform()) ~= nil
+end)
+
+local Services = setmetatable({}, {
+	__index = function(self, name)
+		local ok, svc = pcall(function()
+			return cloneref(game:GetService(name))
+		end)
+		if ok then
+			rawset(self, name, svc)
+			return svc
+		end
+		error("Invalid Service: " .. tostring(name))
+	end
+})
+
+local Players = Services.Players
+local UserInputService = Services.UserInputService
+local TweenService = Services.TweenService
+local RunService = Services.RunService
+
+local COREGUI = Services.CoreGui or Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui")
+local PlayerGui = cloneref(Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui"))
+
+local currentVersion = "1.0.0"
+local PANEL_NAME = "Spider Project"
+
+-- ============ ICON ASSETS ============
+local assets = {
+	["spiderproject/assets/close.png"]        = "rbxassetid://5054663650",
+	["spiderproject/assets/settings.png"]     = "rbxassetid://1204397029",
+	["spiderproject/assets/minimize.png"]     = "rbxassetid://2406617031",
+	["spiderproject/assets/logo.png"]         = "rbxassetid://1352543873",
+	["spiderproject/assets/edittheme.png"]    = "rbxassetid://4911962991",
+	["spiderproject/assets/editkeybinds.png"] = "rbxassetid://129697930",
+}
+
+local function customAsset(asset)
+	if getcustomasset then
+		local ok, res = pcall(function() return getcustomasset(asset) end)
+		if ok and res and res ~= "" then return res end
+	end
+	return assets[asset]
+end
+
+if makefolder and isfolder and writefile and isfile then
+	pcall(function()
+		local src = "https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/"
+		for _, folder in {"spiderproject", "spiderproject/assets"} do
+			if not isfolder(folder) then makefolder(folder) end
+		end
+		for path in pairs(assets) do
+			if not isfile(path) then
+				writefile(path, game:HttpGet(src .. path:gsub("spiderproject/", "")))
+			end
+		end
+		if IsOnMobile then writefile("spiderproject/assets/.nomedia", "") end
+	end)
+end
+
+-- ============ RANDOM STRING ============
+local function randomString()
+	local len = math.random(10, 20)
+	local t = {}
+	for i = 1, len do
+		t[i] = string.char(math.random(32, 126))
+	end
+	return table.concat(t)
+end
+
+-- ============ PARENTING ============
+local PARENT
+local MAX_DISPLAY_ORDER = 1.7976931348623157e308
+if gethui then
+	local Main = Instance.new("ScreenGui")
+	Main.Name = randomString()
+	Main.ResetOnSpawn = false
+	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Parent = gethui()
+	PARENT = Main
+elseif syn_protect_gui then
+	local Main = Instance.new("ScreenGui")
+	Main.Name = randomString()
+	Main.ResetOnSpawn = false
+	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	syn_protect_gui(Main)
+	Main.Parent = COREGUI
+	PARENT = Main
+elseif COREGUI:FindFirstChild("RobloxGui") then
+	PARENT = COREGUI.RobloxGui
+else
+	local Main = Instance.new("ScreenGui")
+	Main.Name = randomString()
+	Main.ResetOnSpawn = false
+	Main.DisplayOrder = MAX_DISPLAY_ORDER
+	Main.Parent = COREGUI
+	PARENT = Main
+end
+
+-- ============ THEME TABLES ============
+local shade1, shade2, shade3 = {}, {}, {}
+local text1, text2 = {}, {}
+local scroll = {}
+
+local function applyTheme()
+	for _, obj in ipairs(shade1) do obj.BackgroundColor3 = Color3.fromRGB(36, 36, 37) end
+	for _, obj in ipairs(shade2) do obj.BackgroundColor3 = Color3.fromRGB(46, 46, 47) end
+	for _, obj in ipairs(shade3) do obj.BackgroundColor3 = Color3.fromRGB(78, 78, 79) end
+	for _, obj in ipairs(text1)  do obj.TextColor3     = Color3.fromRGB(255, 255, 255) end
+	for _, obj in ipairs(text2)  do obj.TextColor3     = Color3.fromRGB(0, 0, 0) end
+	for _, obj in ipairs(scroll) do obj.ScrollBarImageColor3 = Color3.fromRGB(78, 78, 79) end
+end
+
+-- ============ MAIN GUI ============
+local ScaledHolder = Instance.new("Frame")
+ScaledHolder.Name = randomString()
+ScaledHolder.Size = UDim2.fromScale(1, 1)
+ScaledHolder.BackgroundTransparency = 1
+ScaledHolder.Parent = PARENT
+
+local Scale = Instance.new("UIScale")
+Scale.Parent = ScaledHolder
+
+local Holder = Instance.new("Frame")
+Holder.Name = randomString()
+Holder.Parent = ScaledHolder
+Holder.Active = true
+Holder.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+Holder.BorderSizePixel = 0
+Holder.Position = UDim2.new(1, -250, 1, -220)
+Holder.Size = UDim2.new(0, 250, 0, 220)
+Holder.ZIndex = 10
+table.insert(shade2, Holder)
+
+-- Title bar
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Parent = Holder
+Title.Active = true
+Title.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(0, 250, 0, 20)
+Title.Font = Enum.Font.SourceSans
+Title.TextSize = 18
+Title.Text = PANEL_NAME .. " v" .. currentVersion
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.ZIndex = 10
+table.insert(shade1, Title)
+table.insert(text1, Title)
+
+-- Dark area
+local Dark = Instance.new("Frame")
+Dark.Name = "Dark"
+Dark.Parent = Holder
+Dark.Active = true
+Dark.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+Dark.BorderSizePixel = 0
+Dark.Position = UDim2.new(0, 0, 0, 45)
+Dark.Size = UDim2.new(0, 250, 0, 175)
+Dark.ZIndex = 10
+table.insert(shade1, Dark)
+
+-- Command bar
+local Cmdbar = Instance.new("TextBox")
+Cmdbar.Name = "Cmdbar"
+Cmdbar.Parent = Holder
+Cmdbar.BackgroundTransparency = 1
+Cmdbar.BorderSizePixel = 0
+Cmdbar.Position = UDim2.new(0, 5, 0, 20)
+Cmdbar.Size = UDim2.new(0, 240, 0, 25)
+Cmdbar.Font = Enum.Font.SourceSans
+Cmdbar.TextSize = 18
+Cmdbar.TextXAlignment = Enum.TextXAlignment.Left
+Cmdbar.TextColor3 = Color3.new(1, 1, 1)
+Cmdbar.Text = ""
+Cmdbar.PlaceholderText = "Command Bar"
+Cmdbar.ZIndex = 10
+
+-- Command list scroller
+local CMDsF = Instance.new("ScrollingFrame")
+CMDsF.Name = "CMDs"
+CMDsF.Parent = Holder
+CMDsF.BackgroundTransparency = 1
+CMDsF.BorderSizePixel = 0
+CMDsF.Position = UDim2.new(0, 5, 0, 45)
+CMDsF.Size = UDim2.new(0, 245, 0, 175)
+CMDsF.ScrollBarImageColor3 = Color3.fromRGB(78, 78, 79)
+CMDsF.BottomImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+CMDsF.CanvasSize = UDim2.new(0, 0, 0, 0)
+CMDsF.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+CMDsF.ScrollBarThickness = 8
+CMDsF.TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+CMDsF.VerticalScrollBarInset = "Always"
+CMDsF.ZIndex = 10
+table.insert(scroll, CMDsF)
+
+local cmdListLayout = Instance.new("UIListLayout")
+cmdListLayout.Parent = CMDsF
+
+-- Settings button
+local SettingsButton = Instance.new("ImageButton")
+SettingsButton.Name = "SettingsButton"
+SettingsButton.Parent = Holder
+SettingsButton.BackgroundTransparency = 1
+SettingsButton.Position = UDim2.new(0, 230, 0, 0)
+SettingsButton.Size = UDim2.new(0, 20, 0, 20)
+SettingsButton.Image = customAsset("spiderproject/assets/settings.png")
+SettingsButton.ZIndex = 10
+
+-- Intro logo
+local IntroBackground = Instance.new("Frame")
+IntroBackground.Name = "IntroBackground"
+IntroBackground.Parent = Holder
+IntroBackground.Active = true
+IntroBackground.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+IntroBackground.BorderSizePixel = 0
+IntroBackground.Position = UDim2.new(0, 0, 0, 45)
+IntroBackground.Size = UDim2.new(0, 250, 0, 175)
+IntroBackground.ZIndex = 10
+
+local Logo = Instance.new("ImageLabel")
+Logo.Name = "Logo"
+Logo.Parent = Holder
+Logo.BackgroundTransparency = 1
+Logo.BorderSizePixel = 0
+Logo.Position = UDim2.new(0, 125, 0, 127)
+Logo.Size = UDim2.new(0, 10, 0, 10)
+Logo.Image = customAsset("spiderproject/assets/logo.png")
+Logo.ZIndex = 10
+
+-- Intro title text over logo
+local IntroText = Instance.new("TextLabel")
+IntroText.Name = "IntroText"
+IntroText.Parent = Holder
+IntroText.BackgroundTransparency = 1
+IntroText.BorderSizePixel = 0
+IntroText.Position = UDim2.new(0, 0, 0, 175)
+IntroText.Size = UDim2.new(0, 250, 0, 25)
+IntroText.Font = Enum.Font.SourceSansBold
+IntroText.TextSize = 20
+IntroText.Text = PANEL_NAME
+IntroText.TextColor3 = Color3.new(1, 1, 1)
+IntroText.TextTransparency = 0
+IntroText.ZIndex = 10
+table.insert(text1, IntroText)
+
+-- Credits
+local Credits = Instance.new("TextLabel")
+Credits.Name = "Credits"
+Credits.Parent = Holder
+Credits.BackgroundTransparency = 1
+Credits.BorderSizePixel = 0
+Credits.Position = UDim2.new(0, 0, 0.9, 30)
+Credits.Size = UDim2.new(0, 250, 0, 20)
+Credits.Font = Enum.Font.SourceSansLight
+Credits.TextSize = 14
+Credits.Text = PANEL_NAME
+Credits.TextColor3 = Color3.new(1, 1, 1)
+Credits.ZIndex = 10
+table.insert(text1, Credits)
+
+-- Intro animation
+do
+	Scale.Scale = 0.7
+	Logo:TweenSize(UDim2.new(0, 250, 0, 175), "Out", "Quad", 0.8, true)
+	TweenService:Create(Scale, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 1}):Play()
+	task.delay(2, function()
+		Logo:TweenSize(UDim2.new(0, 10, 0, 10), "In", "Quad", 0.5, true)
+		Logo.ImageTransparency = 1
+		IntroText.TextTransparency = 1
+		IntroBackground.Visible = false
+		Credits.Text = ""
+	end)
+end
+
+-- ============ COMMAND SYSTEM ============
+local commands = {
+	{
+		Name = "spiderbot",
+		Description = "Runs the SpiderBot script",
+		Function = function()
+			loadstring(game:HttpGet("https://pastebin.com/raw/gcirbFiE"))()
+		end
+	}
+}
+
+local cmdListFrame = Instance.new("Frame")
+cmdListFrame.Name = "cmds"
+cmdListFrame.Parent = Holder
+cmdListFrame.BackgroundTransparency = 1
+cmdListFrame.Position = UDim2.new(0, 5, 0, 90)
+cmdListFrame.Size = UDim2.new(0, 240, 0, 130)
+cmdListFrame.ZIndex = 10
+
+local Example = Instance.new("TextButton")
+Example.Name = "Example"
+Example.Parent = cmdListFrame
+Example.BackgroundTransparency = 1
+Example.BorderSizePixel = 0
+Example.Size = UDim2.new(0, 240, 0, 20)
+Example.Text = ""
+Example.AutoButtonColor = false
+Example.ZIndex = 10
+Example.Visible = false
+
+local function newCmdEntry(text)
+	local new = Example:Clone()
+	new.Parent = cmdListFrame
+	new.Text = text
+	new.Visible = true
+	new.Name = text:gsub("%s", "")
+	new.ZIndex = 10
+	new.MouseEnter:Connect(function()
+		new.BackgroundTransparency = 0.7
+		new.BackgroundColor3 = Color3.fromRGB(78, 78, 79)
+	end)
+	new.MouseLeave:Connect(function()
+		new.BackgroundTransparency = 1
+	end)
+	new.MouseButton1Click:Connect(function()
+		new.Text = ""
+		if commands[1] then
+			pcall(commands[1].Function)
+		end
+		task.wait(0.5)
+		new.Text = text
+	end)
+	return new
+end
+
+for _, cmd in ipairs(commands) do
+	newCmdEntry(cmd.Name)
+end
+
+-- ============ COMMAND EXECUTION ============
+local function handleCommand(input)
+	if not input or input == "" then return end
+	for _, cmd in ipairs(commands) do
+		if cmd.Name:lower() == input:lower() then
+			local ok, err = pcall(cmd.Function)
+			if not ok then
+				warn("[Spider Project] command error:", err)
+			end
+			return
+		end
+	end
+	warn("[Spider Project] unknown command:", input)
+end
+
+Cmdbar.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		handleCommand(Cmdbar.Text)
+		Cmdbar.Text = ""
+	end
+end)
+
+-- ============ DRAGGING ============
+do
+	local dragging, dragInput, dragStart, startPos
+	local function update(input)
+		local delta = input.Position - dragStart
+		Holder.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	Title.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = Holder.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	Title.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then update(input) end
+	end)
+end
+
+-- ============ TOGGLE KEY (RightControl) ============
+local visible = true
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.RightControl then
+		visible = not visible
+		Holder.Visible = visible
+	end
+end)
+
+applyTheme()
